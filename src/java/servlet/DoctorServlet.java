@@ -1,4 +1,4 @@
-package control;
+package servlet;
 
 import java.io.IOException;
 import javax.servlet.RequestDispatcher;
@@ -8,12 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "HomeServlet", urlPatterns = {"", "/"})
-public class HomeServlet extends HttpServlet {
+@WebServlet(name = "DoctorServlet", urlPatterns = {"/DoctorManagement"})
+public class DoctorServlet extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		RequestDispatcher rd = request.getRequestDispatcher("boundry/home.jsp");
+		RequestDispatcher rd = request.getRequestDispatcher("boundry/doctor.jsp");
 		rd.forward(request, response);
 	}
 }

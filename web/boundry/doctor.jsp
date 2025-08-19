@@ -6,11 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clinic Management System</title>
 
-    <link rel="stylesheet" href="style.css" />
-    <link rel="stylesheet" href="modern-normalize.css" />
-    <link rel="stylesheet" href="util.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/modern-normalize.css" />
+    <link rel="stylesheet" href="css/util.css" />
 
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/components/doctor.css" />
+    <link rel="stylesheet" href="css/components/doctor.css" />
   </head>
   <body>
     <main>
