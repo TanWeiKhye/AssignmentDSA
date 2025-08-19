@@ -16,6 +16,45 @@
 /* xs */
 /* @media (max-width: 475px) {} */
 
+.btn {
+  background-color: var(--clr-brown);
+  border: 1px solid var(--clr-brown);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: var(--clr-light);
+  cursor: pointer;
+  display: block;
+  font-size: var(--size-xl);
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  line-height: 1.47059;
+  overflow: visible;
+  padding: 0.4rem 1rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.btn:hover {
+  background-color: var(--clr-light);
+  border-color: var(--clr-brown);
+}
+
+.btn:active {
+  background-color: var(--clr-brown);
+  border-color: var(--clr-brown);
+  outline: none;
+}
+
+.btn:focus {
+  box-shadow: rgba(131, 192, 253, 0.5) 0 0 0 3px;
+  outline: none;
+}
+
 .container {
   max-width: 1536px;
   margin-left: auto;
