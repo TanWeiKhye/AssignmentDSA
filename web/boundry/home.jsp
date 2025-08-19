@@ -37,19 +37,19 @@
             <div class="container">
                 <h1>Welcome to the Clinic Management System</h1>
                 <div class="link">
-                    <a href="/PatientManagement" class="link_item">
+                    <a href="PatientManagement" class="link_item">
                         Patient Management Module
                     </a>
-                    <a href="/DoctorManagement" class="link_item">
+                    <a href="DoctorManagement" class="link_item">
                         Doctor Management Module
                     </a>
-                    <a href="/ConsultationManagement" class="link_item">
+                    <a href="ConsultationManagement" class="link_item">
                         Consultation Management Module
                     </a>
-                    <a href="/MedicalTreatmentManagement" class="link_item">
+                    <a href="MedicalTreatmentManagement" class="link_item">
                         Medical Treatment Management Module
                     </a>
-                    <a href="/PharmacyManagement" class="link_item">
+                    <a href="PharmacyManagement" class="link_item">
                         Pharmacy Management Module
                     </a>
                 </div>
