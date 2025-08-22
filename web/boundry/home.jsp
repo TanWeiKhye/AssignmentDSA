@@ -37,7 +37,7 @@
             <div class="container">
                 <h1>Welcome to the Clinic Management System</h1>
                 <div class="link">
-                    <a href="PatientManagement" class="link_item">
+                    <a href="/AssignmentDSA/home.jsp" class="link_item">
                         Patient Management Module
                     </a>
                     <a href="DoctorManagement" class="link_item">
