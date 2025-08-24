@@ -14,7 +14,7 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 	}
 
 	private Node insert(T data, Node node) {
-		if (isEmpty()) {
+		if (node == null) {
 			return new Node(data);
 		}
 
@@ -37,7 +37,7 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 	}
 
 	private Node delete(T data, Node node) {
-		if (isEmpty()) {
+		if (node == null) {
 			return null;
 		}
 
@@ -135,9 +135,48 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 		throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
 	}
 
+        @Override
+        public void traverseInOrder(){
+            traverseInOrder(root);
+        }
+        
+        private void traverseInOrder(Node node){
+            if (node != null){
+                traverseInOrder(node.left);
+                System.out.println(node.data);
+                traverseInOrder(node.right);
+            }
+        }
+        
+        @Override
+        public void traversePreOrder(){
+            traversePreOrder(root);
+        }
+        
+        private void traversePreOrder(Node node){
+            if (node != null){
+                System.out.println(node.data);
+                traversePreOrder(node.left);       
+                traversePreOrder(node.right);
+            }
+        }
+        
+        @Override
+        public void traversePostOrder(){
+            traversePostOrder(root);
+        }
+        
+        private void traversePostOrder(Node node){
+            if (node != null){
+                traversePostOrder(node.left);
+                traversePostOrder(node.right);
+                System.out.println(node.data);
+            }
+        }
+        
 	@Override
 	public T getMin() {
-		if (root == null) {
+		if (isEmpty()) {
 			return null;
 		}
 		return getMin(root);
@@ -152,7 +191,7 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 
 	@Override
 	public T getMax() {
-		if (root == null) {
+		if (isEmpty()) {
 			return null;
 		}
 		return getMax(root);
