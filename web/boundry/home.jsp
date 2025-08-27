@@ -1,4 +1,13 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="adt.TreeInterface, entity.Doctor, adt.AVLTree"%>
+<%
+        AVLTree<Doctor> doctors = (AVLTree<Doctor>) request.getAttribute("doctors");
+        String lastIc = "";
+        for (Doctor doctor : doctors) {
+            lastIc = doctor.lastNumOfIc(doctor.getIc());
+            break;
+        }
+%>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -40,7 +49,7 @@
                     <a href="/AssignmentDSA/home.jsp" class="link_item">
                         Patient Management Module
                     </a>
-                    <a href="DoctorManagement" class="link_item">
+                    <a href="DoctorManagement?ic=<%= lastIc %>" class="link_item">
                         Doctor Management Module
                     </a>
                     <a href="ConsultationManagement" class="link_item">

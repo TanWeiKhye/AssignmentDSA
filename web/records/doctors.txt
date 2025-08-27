@@ -1,0 +1,30 @@
+Alan Grant|900101-07-5050|1990-01-01|0123456789|alan.grant@example.com|Male|
+Medical School of Singapore, 2010|Cardiology|
+---
+2025-08-26|Tuesday|Morning|Mount Elizabeth Hospital|Available|
+2025-08-27|Wednesday|Afternoon|Gleneagles Hospital|Available|
+---
+Ellie Sattler|920515-08-6060|1992-05-15|0139876543|ellie.sattler@example.com|Female|
+University of Malaya, 2012|Pediatrics|
+---
+2025-08-26|Tuesday|Afternoon|Kuala Lumpur General Hospital|Available|
+2025-08-28|Thursday|Morning|Pantai Hospital|Available|
+---
+Ian Malcolm|881122-10-7070|1988-11-22|0191234567|ian.malcolm@example.com|Male|
+National University of Singapore, 2008|Oncology|
+---
+2025-08-29|Friday|Morning|Prince Court Medical Centre|Available|
+2025-08-30|Saturday|Morning|Prince Court Medical Centre|Booked|
+---
+Lex Murphy|950310-02-8080|1995-03-10|0177654321|lex.murphy@example.com|Female|
+Universiti Kebangsaan Malaysia, 2015|Dermatology|
+---
+2025-08-27|Wednesday|Morning|Sunway Medical Centre|Available|
+2025-08-29|Friday|Afternoon|Sunway Medical Centre|Available|
+---
+Tim Murphy|980720-05-9090|1998-07-20|0118765432|tim.murphy@example.com|Male|
+University of Putra Malaysia, 2018|Orthopedics|
+---
+2025-08-28|Thursday|Morning|Subang Jaya Medical Centre|Available|
+2025-08-31|Sunday|Afternoon|Subang Jaya Medical Centre|Booked|
+---

@@ -1,11 +1,15 @@
 package adt;
 
-public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
+import java.util.Iterator;
+
+public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Iterable<T> {
 
 	private Node root;
+	private int size;
 
 	public AVLTree() {
 		this.root = null;
+		this.size = 0;
 	}
 
 	@Override
@@ -15,6 +19,7 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 
 	private Node insert(T data, Node node) {
 		if (node == null) {
+			this.size++;
 			return new Node(data);
 		}
 
@@ -58,6 +63,7 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 
 		// A null node after deletion does not need its height updated
 		if (node == null) {
+			this.size--;
 			return node;
 		}
 
@@ -132,48 +138,30 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 
 	@Override
 	public T search(T data) {
-		throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+		return search(data, root);
 	}
 
-        @Override
-        public void traverseInOrder(){
-            traverseInOrder(root);
-        }
-        
-        private void traverseInOrder(Node node){
-            if (node != null){
-                traverseInOrder(node.left);
-                System.out.println(node.data);
-                traverseInOrder(node.right);
-            }
-        }
-        
-        @Override
-        public void traversePreOrder(){
-            traversePreOrder(root);
-        }
-        
-        private void traversePreOrder(Node node){
-            if (node != null){
-                System.out.println(node.data);
-                traversePreOrder(node.left);       
-                traversePreOrder(node.right);
-            }
-        }
-        
-        @Override
-        public void traversePostOrder(){
-            traversePostOrder(root);
-        }
-        
-        private void traversePostOrder(Node node){
-            if (node != null){
-                traversePostOrder(node.left);
-                traversePostOrder(node.right);
-                System.out.println(node.data);
-            }
-        }
-        
+	private T search(T data, Node node) {
+		// If the node is null, the data is not in the tree
+		if (node == null) {
+			return null;
+		}
+
+		// Compare the data with the current node's data
+		int comparison = data.compareTo(node.data);
+
+		// If the data is found, return it
+		if (comparison == 0) {
+			return node.data;
+		} // If the data is less than the current node's data, search the left subtree
+		else if (comparison < 0) {
+			return search(data, node.left);
+		} // If the data is greater, search the right subtree
+		else {
+			return search(data, node.right);
+		}
+	}
+
 	@Override
 	public T getMin() {
 		if (isEmpty()) {
@@ -207,6 +195,136 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 	@Override
 	public boolean isEmpty() {
 		return root == null;
+	}
+
+	@Override
+	public int size() {
+		return size;
+	}
+
+	@Override
+	public Iterator<T> iterator() {
+		return new InOrderIterator();
+	}
+
+	@Override
+	public Iterator<T> preOrderIterator() {
+		return new PreOrderIterator();
+	}
+
+	@Override
+	public Iterator<T> postOrderIterator() {
+		return new PostOrderIterator();
+	}
+
+	// Inner classes for each iterator type
+	private class InOrderIterator implements Iterator<T> {
+
+		private StackInterface<Node> stack;
+
+		public InOrderIterator() {
+			stack = new LinkedStack<>();
+			pushLeftNodes(root);
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !stack.isEmpty();
+		}
+
+		@Override
+		public T next() {
+			if (!hasNext()) {
+				throw new java.util.NoSuchElementException();
+			}
+			Node node = stack.pop();
+			pushLeftNodes(node.right);
+			return node.data;
+		}
+
+		private void pushLeftNodes(Node node) {
+			while (node != null) {
+				stack.push(node);
+				node = node.left;
+			}
+		}
+	}
+
+	private class PreOrderIterator implements Iterator<T> {
+
+		private StackInterface<Node> stack;
+
+		public PreOrderIterator() {
+			stack = new LinkedStack<>();
+			if (root != null) {
+				stack.push(root);
+			}
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !stack.isEmpty();
+		}
+
+		@Override
+		public T next() {
+			if (!hasNext()) {
+				throw new java.util.NoSuchElementException();
+			}
+			Node node = stack.pop();
+			if (node.right != null) {
+				stack.push(node.right);
+			}
+			if (node.left != null) {
+				stack.push(node.left);
+			}
+			return node.data;
+		}
+	}
+
+	private class PostOrderIterator implements Iterator<T> {
+
+		private StackInterface<Node> stack;
+		private Node lastVisited;
+
+		public PostOrderIterator() {
+			stack = new LinkedStack<>();
+			lastVisited = null;
+			pushLeftMost(root);
+		}
+
+		@Override
+		public boolean hasNext() {
+			return !stack.isEmpty();
+		}
+
+		@Override
+		public T next() {
+			if (!hasNext()) {
+				throw new java.util.NoSuchElementException();
+			}
+			Node node = stack.peek();
+
+			// Check if right child exists and hasn't been visited yet
+			if (node.right != null && node.right != lastVisited) {
+				pushLeftMost(node.right);
+				return next(); // Recursive call to find the next element
+			} else {
+				lastVisited = stack.pop();
+				return lastVisited.data;
+			}
+		}
+
+		private void pushLeftMost(Node node) {
+			while (node != null) {
+				stack.push(node);
+				if (node.left != null) {
+					node = node.left;
+				} else {
+					node = node.right;
+				}
+			}
+		}
 	}
 
 	public class Node {

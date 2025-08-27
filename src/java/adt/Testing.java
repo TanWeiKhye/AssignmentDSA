@@ -101,15 +101,6 @@ public class Testing {
         avl.insert(50);
         avl.insert(25);
 
-        System.out.println("\nTraverse in order: ");
-        avl.traverseInOrder();   // prints in sorted order
-
-        System.out.println("Traverse pre order:");
-        avl.traversePreOrder();  // shows tree structure root(parent) first
-
-        System.out.println("Traverse post order:");
-        avl.traversePostOrder(); // visits children nodes before root (parent)
-
         System.out.println("\n=== Test Completed ===");
     }
 }
