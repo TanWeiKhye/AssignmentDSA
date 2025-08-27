@@ -19,15 +19,17 @@ public interface TreeInterface<T> {
     // Finds and returns the maximum element in the tree.
     T getMax();
 
-	// Checks if the tree is empty.
+	  // Checks if the tree is empty.
     boolean isEmpty();
 	
-	// Return the size
-	int size();
+	  // Return the size
+	  int size();
 	
-	Iterator<T> iterator();
+    Iterator<T> iterator();
 
-	Iterator<T> preOrderIterator();
+    Iterator<T> preOrderIterator();
 
-	Iterator<T> postOrderIterator();
+    Iterator<T> postOrderIterator();
+    
+    void clear(); 
 }

@@ -10,41 +10,42 @@ package control;
  */
 
 import adt.Queue;
-import adt.ArrayList;
+import adt.AVLTree;
 import adt.QueueInterface;
 import adt.ListInterface;
+import adt.ArrayList;
+import adt.TreeInterface;
 import entity.Patient;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+
+import java.io.*;
 import java.time.LocalDate;
 
 public class MaintainPatient {
     private QueueInterface<Patient> walkInQueue;
+    private TreeInterface<Patient> patientTree;
     private ListInterface<Patient> allPatients;
 
     public MaintainPatient() {
         walkInQueue = new Queue<>();
+        patientTree = new AVLTree<>();
         allPatients = new ArrayList<>();
-
     }
-    
+
     public Patient[] getQueueAsArray() {
         Patient[] arr = new Patient[walkInQueue.size()];
         for (int i = 0; i < arr.length; i++) {
             Patient p = walkInQueue.dequeue();
             arr[i] = p;
-            walkInQueue.enqueue(p); // maintain order
+            walkInQueue.enqueue(p); 
         }
         return arr;
     }
 
     public void addPatient(Patient patient) {
+        patientTree.insert(patient);
         allPatients.add(patient);
     }
-    
+
     public void addToQueue(Patient p) {
         if (!isInQueue(p.getIcNum())) {
             walkInQueue.enqueue(p);
@@ -55,7 +56,7 @@ public class MaintainPatient {
         int size = walkInQueue.size();
         for (int i = 0; i < size; i++) {
             Patient p = walkInQueue.dequeue();
-            walkInQueue.enqueue(p); // maintain order
+            walkInQueue.enqueue(p);
             if (p.getIcNum().equalsIgnoreCase(icNum)) {
                 return true;
             }
@@ -67,104 +68,86 @@ public class MaintainPatient {
         return walkInQueue.isEmpty() ? null : walkInQueue.dequeue();
     }
 
-    public Patient searchPatientByIC(String icNum) {
-        for (Patient p : allPatients.toArray(new Patient[0])) {
-            if (p.getIcNum().equalsIgnoreCase(icNum)) {
-                return p;
-            }
+    public Patient serveSpecificPatient(int index) {
+        if (index < 0 || index >= walkInQueue.size()) {
+            return null;
         }
-        return null;
+        return walkInQueue.remove(index);
+    }
+
+    public Patient searchPatientByIC(String icNum) {
+        Patient temp = new Patient();
+        temp.setIcNum(icNum);
+        return patientTree.search(temp);
     }
 
     public boolean updatePatient(String icNum, String name, String gender, LocalDate dateOfBirth,
                                  String phoneNum, String email, String address) {
-        Patient[] patients = getAllPatientsArray();
-        boolean updated = false;
-        walkInQueue.clear();
-        for (int i = 0; i < patients.length; i++) {
-            Patient p = patients[i];
-            if (p.getIcNum().equalsIgnoreCase(icNum)) {
-                if (name != null && !name.isEmpty()) p.setName(name);
-                if (gender != null && !gender.isEmpty()) p.setGender(gender);
-                if (dateOfBirth != null) p.setDateOfBirth(dateOfBirth);
-                if (phoneNum != null) p.setPhoneNum(phoneNum);
-                if (email != null) p.setEmail(email);
-                if (address != null) p.setAddress(address);
-                updated = true;
-            }
-            walkInQueue.enqueue(p);
-        }
-        return updated;
+        Patient patient = searchPatientByIC(icNum);
+        if (patient == null) return false;
+
+        if (name != null && !name.isEmpty()) patient.setName(name);
+        if (gender != null && !gender.isEmpty()) patient.setGender(gender);
+        if (dateOfBirth != null) patient.setDateOfBirth(dateOfBirth);
+        if (phoneNum != null) patient.setPhoneNum(phoneNum);
+        if (email != null) patient.setEmail(email);
+        if (address != null) patient.setAddress(address);
+
+        return true;
     }
 
     public boolean removePatientByIC(String icNum) {
+        Patient target = searchPatientByIC(icNum);
         boolean removed = false;
 
-        // Remove from allPatients
+        if (target != null) {
+            patientTree.delete(target);
+            removed = true;
+        }
+
         for (int i = 0; i < allPatients.size(); i++) {
             if (allPatients.get(i).getIcNum().equalsIgnoreCase(icNum)) {
                 allPatients.remove(i);
-                removed = true;
                 break;
             }
         }
 
-        // Remove from walkInQueue
-        int queueSize = walkInQueue.size();
-        for (int i = 0; i < queueSize; i++) {
+        return removeFromQueueByIC(icNum) || removed;
+    }
+
+    public boolean removeFromQueueByIC(String icNum) {
+        int size = walkInQueue.size();
+        boolean removed = false;
+        for (int i = 0; i < size; i++) {
             Patient p = walkInQueue.dequeue();
             if (!p.getIcNum().equalsIgnoreCase(icNum)) {
                 walkInQueue.enqueue(p);
+            } else {
+                removed = true;
             }
         }
-
         return removed;
     }
-    
+
     public Patient removeFromQueueByIndex(int index) {
         if (index >= 0 && index < walkInQueue.size()) {
-            return walkInQueue.remove(index); 
+            return walkInQueue.remove(index);
         }
         return null;
     }
-    
-    public boolean removeFromQueueByIC(String ic) {
-        for (int i = 0; i < walkInQueue.size(); i++) {
-            if (allPatients.get(i).getIcNum().equalsIgnoreCase(ic)) {
-                walkInQueue.remove(i);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    
-    public Patient[] getAllRegisteredPatients() {
-        return allPatients.toArray(new Patient[0]);
-    }
 
     public Patient[] getAllPatientsArray() {
-        int size = walkInQueue.size();
-        Patient[] arr = new Patient[size];
-        for (int i = 0; i < size; i++) {
-            Patient p = walkInQueue.dequeue();
-            arr[i] = p;
-            walkInQueue.enqueue(p);
-        }
-        return arr;
-    }
-    
-    public Patient serveSpecificPatient(int index) {
-        if (index < 0 || index >= walkInQueue.size()) {
-            return null; 
-        }
-        return walkInQueue.remove(index); 
+        return allPatients.toArray(new Patient[0]);
     }
 
     public int getQueueSize() {
         return walkInQueue.size();
     }
-    
+
+    public void clearQueue() {
+        walkInQueue.clear();
+    }
+
     public void clearPatientsOnly() {
         walkInQueue.clear();
     }
@@ -172,8 +155,7 @@ public class MaintainPatient {
     public void savePatientsToFile(String filePath) throws IOException {
         Patient[] patients = getAllPatientsArray();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (int i = 0; i < patients.length; i++) {
-                Patient p = patients[i];
+            for (Patient p : patients) {
                 writer.write(String.join(",",
                         p.getIcNum(),
                         p.getName(),
@@ -191,6 +173,9 @@ public class MaintainPatient {
 
     public void loadPatientsFromFile(String filePath) throws IOException {
         walkInQueue.clear();
+        allPatients.clear();
+        patientTree.clear();
+
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -198,21 +183,17 @@ public class MaintainPatient {
                 if (data.length >= 8) {
                     Patient p = new Patient(
                             data[0],
-                            data[1], 
-                            data[2], 
-                            data[3].isEmpty() ? null : LocalDate.parse(data[3]), 
-                            data[4], 
-                            data[5], 
-                            data[6], 
+                            data[1],
+                            data[2],
+                            data[3].isEmpty() ? null : LocalDate.parse(data[3]),
+                            data[4],
+                            data[5],
+                            data[6],
                             data[7].isEmpty() ? null : LocalDate.parse(data[7])
                     );
                     addPatient(p);
                 }
             }
         }
-    }
-
-    public void clearQueue() {
-        walkInQueue.clear();
     }
 }
