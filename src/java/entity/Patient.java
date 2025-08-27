@@ -9,69 +9,122 @@ package entity;
  * @author hongj
  */
 import java.time.LocalDate;
+import java.util.Date;
 
-public class Patient {
-    private String ICNum;
-    private String name;
+public class Patient extends Person implements Comparable<Patient>{
     private String gender;
-    private LocalDate dateOfBirth;
-    private String phoneNum;
-    private String email;
     private String address;
     private LocalDate dateRegistered;
 
     public Patient() {
+        super(); // call Person's constructor
         this.dateRegistered = LocalDate.now();
     }
 
     public Patient(String ICNum, String name, String gender, LocalDate dateOfBirth,
                    String phoneNum, String email, String address, LocalDate dateRegistered) {
-        this.ICNum = ICNum;
-        this.name = name;
+        super(name, ICNum, toUtilDate(dateOfBirth), phoneNum, email);
         this.gender = gender;
-        this.dateOfBirth = dateOfBirth;
-        this.phoneNum = phoneNum;
-        this.email = email;
         this.address = address;
         this.dateRegistered = dateRegistered != null ? dateRegistered : LocalDate.now();
     }
 
-    public String getIcNum() { return ICNum; }
-    public void setIcNum(String ICNum) { this.ICNum = ICNum; }
+    private static Date toUtilDate(LocalDate localDate) {
+        return localDate != null ? java.sql.Date.valueOf(localDate) : null;
+    }
+    
+    public Patient(String icNum) {
+        super(); // still calls the default Person constructor
+        this.setIcNum(icNum); // set IC using the setter
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    private static LocalDate toLocalDate(Date date) {
+        return date != null ? new java.sql.Date(date.getTime()).toLocalDate() : null;
+    }
 
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
+    public String getIcNum() {
+        return super.getIc();
+    }
 
-    public LocalDate getDateOfBirth() { return dateOfBirth; }
-    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+    public void setIcNum(String ic) {
+        super.setIc(ic);
+    }
 
-    public String getPhoneNum() { return phoneNum; }
-    public void setPhoneNum(String phoneNum) { this.phoneNum = phoneNum; }
+    public LocalDate getDateOfBirth() {
+        return toLocalDate(super.getDateOB());
+    }
 
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        super.setDateOB(toUtilDate(dateOfBirth));
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public String getPhoneNum() {
+        return super.getPhoneNumber();
+    }
 
-    public LocalDate getDateRegistered() { return dateRegistered; }
-    public void setDateRegistered(LocalDate dateRegistered) { this.dateRegistered = dateRegistered; }
+    public void setPhoneNum(String phoneNum) {
+        super.setPhoneNumber(phoneNum);
+    }
+
+    @Override
+    public String getEmail() {
+        return super.getEmail();
+    }
+
+    @Override
+    public void setEmail(String email) {
+        super.setEmail(email);
+    }
+
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
+    @Override
+    public void setName(String name) {
+        super.setName(name);
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public LocalDate getDateRegistered() {
+        return dateRegistered;
+    }
+
+    public void setDateRegistered(LocalDate dateRegistered) {
+        this.dateRegistered = dateRegistered;
+    }
+    
+    public int compareTo(Patient other) {
+        return this.getIcNum().compareToIgnoreCase(other.getIcNum());
+    }
 
     @Override
     public String toString() {
         return "Patient{" +
-                "IC='" + ICNum + '\'' +
-                ", Name='" + name + '\'' +
+                "IC='" + getIcNum() + '\'' +
+                ", Name='" + getName() + '\'' +
                 ", Gender='" + gender + '\'' +
-                ", DOB=" + dateOfBirth +
-                ", Phone='" + phoneNum + '\'' +
-                ", Email='" + email + '\'' +
+                ", DOB=" + getDateOfBirth() +
+                ", Phone='" + getPhoneNum() + '\'' +
+                ", Email='" + getEmail() + '\'' +
                 ", Address='" + address + '\'' +
                 ", Registered=" + dateRegistered +
                 '}';
     }
 }
-
