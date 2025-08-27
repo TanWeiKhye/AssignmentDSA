@@ -212,8 +212,6 @@ public class MaintainPatientServlet extends HttpServlet {
 
     
     private void handlePatientAdd(HttpServletRequest req, HttpServletResponse res) throws Exception {
-        LOGGER.info("Handling patientAdd action");
-
         String ic = validateRequiredField(req, "ic");
         String name = validateRequiredField(req, "name");
         String gender = req.getParameter("gender");
@@ -222,29 +220,34 @@ public class MaintainPatientServlet extends HttpServlet {
         String address = req.getParameter("address");
         LocalDate dob = parseDate(req.getParameter("dob"));
 
-        LOGGER.info("Checking if patient exists: " + ic);
         Patient existingPatient = patientManager.searchPatientByIC(ic);
 
+        Patient patientToUse;
+
         if (existingPatient != null) {
-            LOGGER.warning("Patient already exists: " + ic);
-            req.setAttribute("message", "Patient with this IC already exists.");
-            req.getRequestDispatcher("patientForm.jsp").forward(req, res);
-            return;
+            // Patient already registered; use existing record
+            patientToUse = existingPatient;
+            req.setAttribute("message", "Welcome back! You have been added to the queue.");
+        } else {
+            // New patient registration
+            patientToUse = new Patient(ic, name, gender, dob, phone, email, address, LocalDate.now());
+            patientManager.addPatient(patientToUse); // Add to AVL tree
+            savePatientData();                       // Save only if new
+            req.setAttribute("message", "Patient registered successfully and added to queue.");
         }
 
-        LOGGER.info("Creating new patient: " + name);
-        Patient newPatient = new Patient(ic, name, gender, dob, phone, email, address, LocalDate.now());
-
-        patientManager.addPatient(newPatient);
-        patientManager.addToQueue(newPatient);
-        trackQueueTime(ic);
+        // Add to queue if not already in queue
+        if (!patientManager.isInQueue(ic)) {
+            patientManager.addToQueue(patientToUse);
+            trackQueueTime(ic);
+            saveQueueData();
+        } else {
+            req.setAttribute("message", "You are already in the queue.");
+        }
 
         getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray());
-        savePatientData();
-        saveQueueData();
 
-        LOGGER.info("Patient added successfully: " + ic);
-        req.setAttribute("newPatient", newPatient);
+        req.setAttribute("newPatient", patientToUse);
         req.setAttribute("walkInQueue", patientManager.getQueueAsArray());
         req.getRequestDispatcher("appointmentSummary.jsp").forward(req, res);
     }

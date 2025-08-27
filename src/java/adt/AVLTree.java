@@ -132,8 +132,21 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 
 	@Override
 	public T search(T data) {
-		throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-	}
+            return search(data, root);
+        }
+
+        private T search(T data, Node node) {
+            if (node == null) return null;
+
+            int cmp = data.compareTo(node.data);
+            if (cmp < 0) {
+                return search(data, node.left);
+            } else if (cmp > 0) {
+                return search(data, node.right);
+            } else {
+                return node.data; // match found
+            }
+        }
 
         @Override
         public void traverseInOrder(){
@@ -223,4 +236,10 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T> {
 			this.height = 1;
 		}
 	}
+        
+        
+        @Override
+        public void clear() {
+            root = null;
+        }
 }
