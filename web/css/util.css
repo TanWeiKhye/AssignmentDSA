@@ -55,6 +55,33 @@
   outline: none;
 }
 
+.btn-success {
+  background-color: #28a745 !important;
+  color: #ffffff !important;
+}
+
+.btn-success:hover {
+  background-color: #218838 !important;
+}
+
+.btn-warning {
+  background-color: #ffc107 !important;
+  color: #343a40 !important;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800 !important;
+}
+
+.btn-danger {
+  background-color: #dc3545 !important;
+  color: #ffffff !important;
+}
+
+.btn-danger:hover {
+  background-color: #c82333 !important;
+}
+
 .container {
   max-width: 1536px;
   margin-left: auto;

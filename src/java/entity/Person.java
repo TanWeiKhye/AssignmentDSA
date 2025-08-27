@@ -8,17 +8,15 @@ public class Person {
 	private Date dateOB;
 	private String phoneNumber;
 	private String email;
-	
-	public Person() {
-		
-	}
+	private String gender;
 
-	public Person(String name, String ic, Date dateOB, String phoneNumber, String email) {
+	public Person(String name, String ic, Date dateOB, String phoneNumber, String email, String gender) {
 		this.name = name;
 		this.ic = ic;
 		this.dateOB = dateOB;
 		this.phoneNumber = phoneNumber;
 		this.email = email;
+		this.gender = gender;
 	}
 
 	public void setPhoneNumber(String phoneNumber) {
@@ -47,6 +45,14 @@ public class Person {
 
 	public void setDateOB(Date dateOB) {
 		this.dateOB = dateOB;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getGender() {
+		return gender;
 	}
 
 	public String getName() {

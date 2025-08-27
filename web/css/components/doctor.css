@@ -8,6 +8,16 @@ header {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+
+  .back {
+    position: absolute;
+    left: 0;
+    padding-left: 2rem;
+    font-size: var(--size-2xl);
+    color: var(--clr-light);
+    text-decoration: none;
+  }
 }
 
 .doctor {
@@ -88,6 +98,21 @@ header {
 
   .doctor_card {
     width: 100%;
+    padding: 2rem;
+    background-color: var(--clr-light);
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  }
+
+  .doctor_card_2_list {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    gap: 2rem;
+  }
+
+  .doctor_card_2 {
+    width: 50%;
     padding: 2rem;
     background-color: var(--clr-light);
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
@@ -216,5 +241,39 @@ header {
         }
       }
     }
+  }
+
+  /* Availability Tracking */
+  .available {
+    .availability-status {
+      margin-top: 10px;
+      margin-bottom: 20px;
+      background-color: #e6f7ff; /* Light blue background */
+      border: 1px solid #b3e0ff;
+      padding: 15px;
+      border-radius: 8px;
+    }
+
+    .availability-status p {
+      margin: 5px 0;
+    }
+
+    .availability-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+    }
+  }
+
+  /* Status Indicators */
+  .status-available {
+    color: #28a745;
+    font-weight: 600;
+  }
+
+  .status-unavailable {
+    color: #dc3545;
+    font-weight: 600;
   }
 }
