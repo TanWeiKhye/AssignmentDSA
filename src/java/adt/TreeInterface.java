@@ -28,4 +28,6 @@ public interface TreeInterface<T> {
 
 	// Checks if the tree is empty.
     boolean isEmpty();
+    
+    void clear(); 
 }
