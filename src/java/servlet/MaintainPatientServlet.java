@@ -311,7 +311,6 @@ public class MaintainPatientServlet extends HttpServlet {
             req.setAttribute("message", "Patient information updated successfully.");
         }
 
-        // Show admin page again with updated data
         req.setAttribute("patients", patientManager.getAllPatientsArray());
         req.setAttribute("walkInQueue", patientManager.getQueueAsArray());
         req.getRequestDispatcher("admin.jsp").forward(req, res);
@@ -321,8 +320,8 @@ public class MaintainPatientServlet extends HttpServlet {
     private void handleDelete(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String ic = validateRequiredField(req, "ic");
 
-        boolean removedFromPatients = patientManager.removePatientByIC(ic); // remove from patient list
-        boolean removedFromQueue = patientManager.removeFromQueueByIC(ic);  // remove from walk-in queue
+        boolean removedFromPatients = patientManager.removePatientByIC(ic); 
+        boolean removedFromQueue = patientManager.removeFromQueueByIC(ic);  
 
         if (removedFromPatients) {
             savePatientData();   
@@ -344,7 +343,7 @@ public class MaintainPatientServlet extends HttpServlet {
         String doctor = req.getParameter("doctor");
         String indexStr = req.getParameter("queueNumber");
 
-        getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray()); // <--- Add this
+        getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray()); 
 
         int indexToServe = -1;
         try {

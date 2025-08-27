@@ -137,7 +137,7 @@ public class MaintainPatient {
     }
 
     public Patient[] getAllPatientsArray() {
-        return allPatients.toArray(new Patient[0]); // from ArrayList
+        return allPatients.toArray(new Patient[0]);
     }
 
     public int getQueueSize() {
