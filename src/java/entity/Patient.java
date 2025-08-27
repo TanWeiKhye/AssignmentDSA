@@ -23,8 +23,7 @@ public class Patient extends Person implements Comparable<Patient>{
 
     public Patient(String ICNum, String name, String gender, LocalDate dateOfBirth,
                    String phoneNum, String email, String address, LocalDate dateRegistered) {
-        super(name, ICNum, toUtilDate(dateOfBirth), phoneNum, email);
-        this.gender = gender;
+        super(name, ICNum, toUtilDate(dateOfBirth), phoneNum, email, gender);
         this.address = address;
         this.dateRegistered = dateRegistered != null ? dateRegistered : LocalDate.now();
     }
@@ -119,7 +118,7 @@ public class Patient extends Person implements Comparable<Patient>{
         return "Patient{" +
                 "IC='" + getIcNum() + '\'' +
                 ", Name='" + getName() + '\'' +
-                ", Gender='" + gender + '\'' +
+                ", Gender='" + getGender() + '\'' +
                 ", DOB=" + getDateOfBirth() +
                 ", Phone='" + getPhoneNum() + '\'' +
                 ", Email='" + getEmail() + '\'' +
