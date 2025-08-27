@@ -9,6 +9,8 @@ public class Person {
 	private String phoneNumber;
 	private String email;
 	private String gender;
+        
+        public Person(){}
 
 	public Person(String name, String ic, Date dateOB, String phoneNumber, String email, String gender) {
 		this.name = name;
