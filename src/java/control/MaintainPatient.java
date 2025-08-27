@@ -36,7 +36,7 @@ public class MaintainPatient {
         for (int i = 0; i < arr.length; i++) {
             Patient p = walkInQueue.dequeue();
             arr[i] = p;
-            walkInQueue.enqueue(p); // maintain order
+            walkInQueue.enqueue(p); 
         }
         return arr;
     }
@@ -105,7 +105,6 @@ public class MaintainPatient {
             removed = true;
         }
 
-        // Remove from ArrayList
         for (int i = 0; i < allPatients.size(); i++) {
             if (allPatients.get(i).getIcNum().equalsIgnoreCase(icNum)) {
                 allPatients.remove(i);

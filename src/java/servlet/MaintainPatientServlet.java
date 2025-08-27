@@ -225,18 +225,15 @@ public class MaintainPatientServlet extends HttpServlet {
         Patient patientToUse;
 
         if (existingPatient != null) {
-            // Patient already registered; use existing record
             patientToUse = existingPatient;
             req.setAttribute("message", "Welcome back! You have been added to the queue.");
         } else {
-            // New patient registration
             patientToUse = new Patient(ic, name, gender, dob, phone, email, address, LocalDate.now());
-            patientManager.addPatient(patientToUse); // Add to AVL tree
-            savePatientData();                       // Save only if new
+            patientManager.addPatient(patientToUse); 
+            savePatientData(); 
             req.setAttribute("message", "Patient registered successfully and added to queue.");
         }
 
-        // Add to queue if not already in queue
         if (!patientManager.isInQueue(ic)) {
             patientManager.addToQueue(patientToUse);
             trackQueueTime(ic);
