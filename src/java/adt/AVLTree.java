@@ -162,61 +162,6 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Itera
 		}
 	}
 
-            return search(data, root);
-        }
-
-        private T search(T data, Node node) {
-            if (node == null) return null;
-
-            int cmp = data.compareTo(node.data);
-            if (cmp < 0) {
-                return search(data, node.left);
-            } else if (cmp > 0) {
-                return search(data, node.right);
-            } else {
-                return node.data; // match found
-            }
-        }
-
-        @Override
-        public void traverseInOrder(){
-            traverseInOrder(root);
-        }
-        
-        private void traverseInOrder(Node node){
-            if (node != null){
-                traverseInOrder(node.left);
-                System.out.println(node.data);
-                traverseInOrder(node.right);
-            }
-        }
-        
-        @Override
-        public void traversePreOrder(){
-            traversePreOrder(root);
-        }
-        
-        private void traversePreOrder(Node node){
-            if (node != null){
-                System.out.println(node.data);
-                traversePreOrder(node.left);       
-                traversePreOrder(node.right);
-            }
-        }
-        
-        @Override
-        public void traversePostOrder(){
-            traversePostOrder(root);
-        }
-        
-        private void traversePostOrder(Node node){
-            if (node != null){
-                traversePostOrder(node.left);
-                traversePostOrder(node.right);
-                System.out.println(node.data);
-            }
-        }
-        
 	@Override
 	public T getMin() {
 		if (isEmpty()) {
@@ -381,6 +326,11 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Itera
 			}
 		}
 	}
+        
+        @Override
+        public void clear() {
+            root = null;
+        }
 
 	public class Node {
 
@@ -396,10 +346,4 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Itera
 			this.height = 1;
 		}
 	}
-        
-        
-        @Override
-        public void clear() {
-            root = null;
-        }
 }
