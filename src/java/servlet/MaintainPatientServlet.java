@@ -53,11 +53,8 @@ public class MaintainPatientServlet extends HttpServlet {
             while ((line = br.readLine()) != null) {
                 String[] d = line.split(",");
                 if (d.length >= 8) {
-                    String rawGender = d[2].trim();
-                    String gender = (rawGender.isEmpty() || rawGender.equalsIgnoreCase("Unknown")) ? null : rawGender;
-
                     Patient p = new Patient(
-                        d[0], d[1], gender,
+                        d[0], d[1], d[2],
                         parseDate(d[3]), d[4], d[5], d[6],
                         parseDate(d[7])
                     );
@@ -666,7 +663,7 @@ public class MaintainPatientServlet extends HttpServlet {
 
     private void savePatientData() throws IOException {
         String patientFile = getDataFilePath("patients.txt");
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(patientFile, false))) { // false = overwrite
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(patientFile, false))) { 
             for (Patient p : patientManager.getAllPatientsArray()) {
                 bw.write(String.join(",",
                     p.getIcNum(), 
@@ -685,7 +682,7 @@ public class MaintainPatientServlet extends HttpServlet {
     
     private void saveQueueData() throws IOException {
         String queueFile = getDataFilePath("queue.txt");
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(queueFile, false))) { // false = overwrite
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(queueFile, false))) { 
             Patient[] queue = patientManager.getQueueAsArray();
             for (int i = 0; i < queue.length; i++) {
                 Patient p = queue[i];
