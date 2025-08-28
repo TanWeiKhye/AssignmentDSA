@@ -45,8 +45,9 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private void loadPatientData() throws IOException {
-        String patientFile = getDataFilePath("patients.txt");
+        patientManager.clearPatientsOnly(); 
 
+        String patientFile = getDataFilePath("patients.txt");
         try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -57,7 +58,9 @@ public class MaintainPatientServlet extends HttpServlet {
                         parseDate(d[3]), d[4], d[5], d[6],
                         parseDate(d[7])
                     );
-                    patientManager.addPatient(p); 
+                    if (patientManager.searchPatientByIC(d[0]) == null) {
+                        patientManager.addPatient(p);
+                    }
                 }
             }
         } catch (FileNotFoundException e) {
@@ -86,7 +89,7 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private LocalDate parseDate(String s) {
-        return (s == null || s.isEmpty()) ? null : LocalDate.parse(s);
+        return (s == null || s.isEmpty() || s.equals("null")) ? null : LocalDate.parse(s);
     }
 
     private String getDataFilePath(String filename) {
@@ -98,14 +101,14 @@ public class MaintainPatientServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
 
-    if ("dailyReport".equals(action)) {
-        handleDailyPatientReport(request, response); 
-        return;
-    }
-    if ("queueTimeReport".equals(action)) {
-        handleQueueTimeReport(request, response); 
-        return;
-    }
+        if ("dailyReport".equals(action)) {
+            handleDailyPatientReport(request, response); 
+            return;
+        }
+        if ("queueTimeReport".equals(action)) {
+            handleQueueTimeReport(request, response); 
+            return;
+        }
 
         patientManager.clearPatientsOnly();
         loadPatientData();
@@ -117,8 +120,8 @@ public class MaintainPatientServlet extends HttpServlet {
 
         request.setAttribute("walkInQueue", patientManager.getQueueAsArray());
         request.setAttribute("patients", patientManager.getAllPatientsArray());
-        request.setAttribute("doctorTAN", getServletContext().getAttribute("doctorTAN"));
-        request.setAttribute("doctorTEOH", getServletContext().getAttribute("doctorTEOH"));
+        request.setAttribute("consultRoom1", getServletContext().getAttribute("consultRoom1"));
+        request.setAttribute("consultRoom2", getServletContext().getAttribute("consultRoom2"));
 
         request.getRequestDispatcher("admin.jsp").forward(request, response);
     }
@@ -127,6 +130,10 @@ public class MaintainPatientServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String action = req.getParameter("action");
         
+        patientManager.clearPatientsOnly();
+        loadPatientData();
+        patientManager.clearQueue();
+        loadQueueData();
 
         try {
             switch (action) {
@@ -175,13 +182,12 @@ public class MaintainPatientServlet extends HttpServlet {
             req.setAttribute("message", "Error: " + e.getMessage());
             req.getRequestDispatcher("admin.jsp").forward(req, res);
         }
-        
     }
     
     private void handleAdd(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String ic = validateRequiredField(req, "ic");
         String name = validateRequiredField(req, "name");
-        String gender = req.getParameter("gender");
+        String gender = validateRequiredField(req, "gender"); 
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
         String address = req.getParameter("address");
@@ -214,7 +220,7 @@ public class MaintainPatientServlet extends HttpServlet {
     private void handlePatientAdd(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String ic = validateRequiredField(req, "ic");
         String name = validateRequiredField(req, "name");
-        String gender = req.getParameter("gender");
+        String gender = validateRequiredField(req, "gender"); 
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
         String address = req.getParameter("address");
@@ -289,7 +295,7 @@ public class MaintainPatientServlet extends HttpServlet {
     private void handleUpdate(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String ic = validateRequiredField(req, "ic");
         String name = validateRequiredField(req, "name");
-        String gender = req.getParameter("gender");
+        String gender = validateRequiredField(req, "gender"); 
         LocalDate dob = parseDate(req.getParameter("dob"));
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
@@ -338,9 +344,8 @@ public class MaintainPatientServlet extends HttpServlet {
         req.getRequestDispatcher("admin.jsp").forward(req, res);
     }
 
-
-    private void handleServeNext(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String doctor = req.getParameter("doctor");
+        private void handleServeNext(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        String consultRoom = req.getParameter("consultRoom");
         String indexStr = req.getParameter("queueNumber");
 
         getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray()); 
@@ -352,13 +357,13 @@ public class MaintainPatientServlet extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             req.setAttribute("message", "Invalid queue number.");
-            forwardWithDoctorData(req, res);
+            forwardWithConsultRoomData(req, res);
             return;
         }
 
-        if (doctor == null || (!doctor.equals("tan") && !doctor.equals("teoh"))) {
-            req.setAttribute("message", "Please select a valid doctor.");
-            forwardWithDoctorData(req, res);
+        if (consultRoom == null || (!consultRoom.equals("consultRoom1") && !consultRoom.equals("consultRoom2"))) {
+            req.setAttribute("message", "Please select a valid consultation room.");
+            forwardWithConsultRoomData(req, res);
             return;
         }
 
@@ -369,13 +374,13 @@ public class MaintainPatientServlet extends HttpServlet {
             }
         } catch (IOException e) {
             req.setAttribute("message", "Error reading queue file.");
-            forwardWithDoctorData(req, res);
+            forwardWithConsultRoomData(req, res);
             return;
         }
 
         if (indexToServe < 0 || indexToServe >= queueFileSize) {
             req.setAttribute("message", "Queue number out of range. Total in queue: " + queueFileSize);
-            forwardWithDoctorData(req, res);
+            forwardWithConsultRoomData(req, res);
             return;
         }
         
@@ -385,84 +390,84 @@ public class MaintainPatientServlet extends HttpServlet {
         Patient selectedPatient = patientManager.serveSpecificPatient(indexToServe); 
 
         if (selectedPatient != null) {
-            if (doctor.equals("tan")) {
-                Patient current = (Patient) getServletContext().getAttribute("doctorTAN");
+            if (consultRoom.equals("consultRoom1")) {
+                Patient current = (Patient) getServletContext().getAttribute("consultRoom1");
                 if (current != null) {
                     logServedPatient(current); 
                 }
-                getServletContext().setAttribute("doctorTAN", selectedPatient);
+                getServletContext().setAttribute("consultRoom1", selectedPatient);
                 getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray());
                 saveQueueData();
 
-                Patient doctorTeoh = (Patient) getServletContext().getAttribute("doctorTEOH");
-                if (doctorTeoh != null && doctorTeoh.getIcNum().equals(selectedPatient.getIcNum())) {
-                    getServletContext().removeAttribute("doctorTEOH");
+                Patient consultRoom2 = (Patient) getServletContext().getAttribute("consultRoom2");
+                if (consultRoom2 != null && consultRoom2.getIcNum().equals(selectedPatient.getIcNum())) {
+                    getServletContext().removeAttribute("consultRoom2");
                 }
 
-                req.setAttribute("message", "Doctor TAN is now serving: " + selectedPatient.getName());
+                req.setAttribute("message", "Consultation Room 1 is now serving: " + selectedPatient.getName());
 
-            } else if (doctor.equals("teoh")) {
-                Patient current = (Patient) getServletContext().getAttribute("doctorTEOH");
+            } else if (consultRoom.equals("consultRoom2")) {
+                Patient current = (Patient) getServletContext().getAttribute("consultRoom2");
                 if (current != null) {
                     logServedPatient(current); 
                 }
-                getServletContext().setAttribute("doctorTEOH", selectedPatient);
+                getServletContext().setAttribute("consultRoom2", selectedPatient);
                 getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray());
                 saveQueueData();
 
-                Patient doctorTan = (Patient) getServletContext().getAttribute("doctorTAN");
-                if (doctorTan != null && doctorTan.getIcNum().equals(selectedPatient.getIcNum())) {
-                    getServletContext().removeAttribute("doctorTAN");
+                Patient consultRoom1 = (Patient) getServletContext().getAttribute("consultRoom1");
+                if (consultRoom1 != null && consultRoom1.getIcNum().equals(selectedPatient.getIcNum())) {
+                    getServletContext().removeAttribute("consultRoom1");
                 }
 
-                req.setAttribute("message", "Doctor TEOH is now serving: " + selectedPatient.getName());
+                req.setAttribute("message", "Consultation Room 2 is now serving: " + selectedPatient.getName());
             }
         } else {
             req.setAttribute("message", "Unable to serve patient.");
         }
 
-        forwardWithDoctorData(req, res);
+        forwardWithConsultRoomData(req, res);
     }
     
     private void handleEndServe(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        String doctor = req.getParameter("doctor");
+        String consultRoom = req.getParameter("consultRoom");
 
-        if (doctor == null || (!doctor.equals("tan") && !doctor.equals("teoh"))) {
-            req.setAttribute("message", "Invalid doctor specified.");
-            forwardWithDoctorData(req, res);
+        if (consultRoom == null || (!consultRoom.equals("consultRoom1") && !consultRoom.equals("consultRoom2"))) {
+            req.setAttribute("message", "Invalid consultation room specified.");
+            forwardWithConsultRoomData(req, res);
             return;
         }
 
-        if (doctor.equals("tan")) {
-            Patient current = (Patient) getServletContext().getAttribute("doctorTAN");
+        if (consultRoom.equals("consultRoom1")) {
+            Patient current = (Patient) getServletContext().getAttribute("consultRoom1");
             if (current != null) {
                 logServedPatient(current); 
             }
-            getServletContext().removeAttribute("doctorTAN");
-            req.setAttribute("message", "Doctor TAN is now on break.");
+            getServletContext().removeAttribute("consultRoom1");
+            req.setAttribute("message", "Consultation Room 1 is now available.");
         } else {
-            Patient current = (Patient) getServletContext().getAttribute("doctorTEOH");
+            Patient current = (Patient) getServletContext().getAttribute("consultRoom2");
             if (current != null) {
                 logServedPatient(current); 
             }
-            getServletContext().removeAttribute("doctorTEOH");
-            req.setAttribute("message", "Doctor TEOH is now on break.");
+            getServletContext().removeAttribute("consultRoom2");
+            req.setAttribute("message", "Consultation Room 2 is now available.");
         }
 
-        forwardWithDoctorData(req, res);
+        forwardWithConsultRoomData(req, res);
     }
     
     private void handleClearQueue(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         patientManager.clearQueue(); 
         saveQueueData();  
 
-        getServletContext().removeAttribute("doctorTAN");
-        getServletContext().removeAttribute("doctorTEOH");
+        getServletContext().removeAttribute("consultRoom1");
+        getServletContext().removeAttribute("consultRoom2");
 
         getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray());
 
         req.setAttribute("message", "All patients have been cleared from the queue.");
-        forwardWithDoctorData(req, res);
+        forwardWithConsultRoomData(req, res);
     }
     
     private void handleClearSpecificPatient(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -483,7 +488,7 @@ public class MaintainPatientServlet extends HttpServlet {
             req.setAttribute("message", "Invalid queue number input.");
         }
 
-        forwardWithDoctorData(req, res);
+        forwardWithConsultRoomData(req, res);
     }
 
     
@@ -578,9 +583,9 @@ public class MaintainPatientServlet extends HttpServlet {
         req.getRequestDispatcher("queueTimeReport.jsp").forward(req, res);
     }
 
-    private void forwardWithDoctorData(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        req.setAttribute("doctorTAN", getServletContext().getAttribute("doctorTAN"));
-        req.setAttribute("doctorTEOH", getServletContext().getAttribute("doctorTEOH"));
+    private void forwardWithConsultRoomData(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        req.setAttribute("consultRoom1", getServletContext().getAttribute("consultRoom1"));
+        req.setAttribute("consultRoom2", getServletContext().getAttribute("consultRoom2"));
         req.setAttribute("patients", patientManager.getAllPatientsArray());
         req.setAttribute("walkInQueue", patientManager.getQueueAsArray());
         req.getRequestDispatcher("admin.jsp").forward(req, res);
@@ -657,12 +662,17 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private void savePatientData() throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(getDataFilePath("patients.txt")))) {
+        String patientFile = getDataFilePath("patients.txt");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(patientFile, false))) { 
             for (Patient p : patientManager.getAllPatientsArray()) {
                 bw.write(String.join(",",
-                    p.getIcNum(), p.getName(), p.getGender(),
+                    p.getIcNum(), 
+                    p.getName(), 
+                    p.getGender(), 
                     p.getDateOfBirth() != null ? p.getDateOfBirth().toString() : "",
-                    p.getPhoneNum(), p.getEmail(), p.getAddress(),
+                    p.getPhoneNum() != null ? p.getPhoneNum() : "",
+                    p.getEmail() != null ? p.getEmail() : "",
+                    p.getAddress() != null ? p.getAddress() : "",
                     p.getDateRegistered() != null ? p.getDateRegistered().toString() : ""
                 ));
                 bw.newLine();
@@ -671,7 +681,8 @@ public class MaintainPatientServlet extends HttpServlet {
     }
     
     private void saveQueueData() throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(getDataFilePath("queue.txt")))) {
+        String queueFile = getDataFilePath("queue.txt");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(queueFile, false))) { 
             Patient[] queue = patientManager.getQueueAsArray();
             for (int i = 0; i < queue.length; i++) {
                 Patient p = queue[i];

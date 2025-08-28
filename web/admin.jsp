@@ -12,8 +12,8 @@
     Patient[] walkInQueue = (Patient[]) request.getAttribute("walkInQueue"); 
     Patient searchResult = (Patient) request.getAttribute("searchResult");
 
-    Patient doctorTAN = (Patient) application.getAttribute("doctorTAN");
-    Patient doctorTEOH = (Patient) application.getAttribute("doctorTEOH");
+    Patient consultRoom1 = (Patient) application.getAttribute("consultRoom1");
+    Patient consultRoom2 = (Patient) application.getAttribute("consultRoom2");
     entity.Patient[] walkInQueuePersist = (entity.Patient[]) application.getAttribute("walkInQueue");
 %>
 <!DOCTYPE html>
@@ -172,26 +172,26 @@ th, td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
             <h2>Currently Serving</h2>
 
 
-            <h3>Doctor TAN</h3>
-            <% if (doctorTAN != null) { %>
-                <p><strong>IC:</strong> <%= doctorTAN.getIcNum() %></p>
-                <p><strong>Name:</strong> <%= doctorTAN.getName() %></p>
-                <form method="post" action="MaintainPatientServlet" onsubmit="return confirm('End service for Doctor TAN?');">
+            <h3>Consultation Room 1</h3>
+            <% if (consultRoom1 != null) { %>
+                <p><strong>IC:</strong> <%= consultRoom1.getIcNum() %></p>
+                <p><strong>Name:</strong> <%= consultRoom1.getName() %></p>
+                <form method="post" action="MaintainPatientServlet" onsubmit="return confirm('End service for Consultation Room 1?');">
                     <input type="hidden" name="action" value="endServe">
-                    <input type="hidden" name="doctor" value="tan">
+                    <input type="hidden" name="consultRoom" value="consultRoom1">
                     <button type="submit" style="background:#e67e22;">End Serve</button>
                 </form>
             <% } else { %>
                 <p>Not serving any patient.</p>
             <% } %>
 
-            <h3>Doctor TEOH</h3>
-            <% if (doctorTEOH != null) { %>
-                <p><strong>IC:</strong> <%= doctorTEOH.getIcNum() %></p>
-                <p><strong>Name:</strong> <%= doctorTEOH.getName() %></p>
-                <form method="post" action="MaintainPatientServlet" onsubmit="return confirm('End service for Doctor TAN?');">
+            <h3>Consultation Room 2</h3>
+            <% if (consultRoom2 != null) { %>
+                <p><strong>IC:</strong> <%= consultRoom2.getIcNum() %></p>
+                <p><strong>Name:</strong> <%= consultRoom2.getName() %></p>
+                <form method="post" action="MaintainPatientServlet" onsubmit="return confirm('End service for Consultation Room 2?');">
                     <input type="hidden" name="action" value="endServe">
-                    <input type="hidden" name="doctor" value="teoh">
+                    <input type="hidden" name="consultRoom" value="consultRoom2">
                     <button type="submit" style="background:#e67e22;">End Serve</button>
                 </form>
             <% } else { %>
@@ -319,16 +319,16 @@ th, td { padding: 8px; border-bottom: 1px solid #eee; text-align: left; }
 
 <div class="form-popup" id="serveForm">
     <h2>Serve Next</h2>
-    <form id="serveDoctorForm" method="post" action="MaintainPatientServlet">
+    <form id="serveConsultRoomForm" method="post" action="MaintainPatientServlet">
         <input type="hidden" name="action" value="serve">
-        <input type="hidden" name="doctor" id="doctorField">
+        <input type="hidden" name="consultRoom" id="consultRoomField">
 
         <label>Enter Queue Number to Serve:</label>
         <input type="number" name="queueNumber" min="1" required>
 
         <div style="margin-top: 12px;">
-            <button type="button" onclick="submitServeForm('tan')">Doctor TAN</button>
-            <button type="button" onclick="submitServeForm('teoh')">Doctor TEOH</button>
+            <button type="button" onclick="submitServeForm('consultRoom1')">Consultation Room 1</button>
+            <button type="button" onclick="submitServeForm('consultRoom2')">Consultation Room 2</button>
             <button type="button" class="close-btn" onclick="closeForm()">Cancel</button>
         </div>
     </form>
@@ -393,9 +393,9 @@ function closeForm() {
     }
 <% } %>
     
-function submitServeForm(doctor) {
-    document.getElementById('doctorField').value = doctor;
-    document.getElementById('serveDoctorForm').submit();
+function submitServeForm(consultRoom) {
+    document.getElementById('consultRoomField').value = consultRoom;
+    document.getElementById('serveConsultRoomForm').submit();
 }
 </script>
 </body>
