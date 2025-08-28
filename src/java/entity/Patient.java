@@ -17,13 +17,14 @@ public class Patient extends Person implements Comparable<Patient>{
     private LocalDate dateRegistered;
 
     public Patient() {
-        super(); // call Person's constructor
+        super(); 
         this.dateRegistered = LocalDate.now();
     }
 
     public Patient(String ICNum, String name, String gender, LocalDate dateOfBirth,
                    String phoneNum, String email, String address, LocalDate dateRegistered) {
         super(name, ICNum, toUtilDate(dateOfBirth), phoneNum, email, gender);
+        this.gender = gender;
         this.address = address;
         this.dateRegistered = dateRegistered != null ? dateRegistered : LocalDate.now();
     }
@@ -85,10 +86,12 @@ public class Patient extends Person implements Comparable<Patient>{
         super.setName(name);
     }
 
+    @Override
     public String getGender() {
         return gender;
     }
 
+    @Override
     public void setGender(String gender) {
         this.gender = gender;
     }
@@ -109,6 +112,7 @@ public class Patient extends Person implements Comparable<Patient>{
         this.dateRegistered = dateRegistered;
     }
     
+    @Override
     public int compareTo(Patient other) {
         return this.getIcNum().compareToIgnoreCase(other.getIcNum());
     }

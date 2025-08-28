@@ -100,8 +100,8 @@
         <input type="email" name="email">
 
         <label>Gender</label>
-        <select name="gender">
-            <option value="">-- Select Gender --</option>
+        <select name="gender" required>
+            <option value="" disabled selected>Select gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
         </select>

@@ -45,19 +45,25 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private void loadPatientData() throws IOException {
-        String patientFile = getDataFilePath("patients.txt");
+        patientManager.clearPatientsOnly(); 
 
+        String patientFile = getDataFilePath("patients.txt");
         try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] d = line.split(",");
                 if (d.length >= 8) {
+                    String rawGender = d[2].trim();
+                    String gender = (rawGender.isEmpty() || rawGender.equalsIgnoreCase("Unknown")) ? null : rawGender;
+
                     Patient p = new Patient(
-                        d[0], d[1], d[2],
+                        d[0], d[1], gender,
                         parseDate(d[3]), d[4], d[5], d[6],
                         parseDate(d[7])
                     );
-                    patientManager.addPatient(p); 
+                    if (patientManager.searchPatientByIC(d[0]) == null) {
+                        patientManager.addPatient(p);
+                    }
                 }
             }
         } catch (FileNotFoundException e) {
@@ -86,7 +92,7 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private LocalDate parseDate(String s) {
-        return (s == null || s.isEmpty()) ? null : LocalDate.parse(s);
+        return (s == null || s.isEmpty() || s.equals("null")) ? null : LocalDate.parse(s);
     }
 
     private String getDataFilePath(String filename) {
@@ -98,14 +104,14 @@ public class MaintainPatientServlet extends HttpServlet {
             throws ServletException, IOException {
         String action = request.getParameter("action");
 
-    if ("dailyReport".equals(action)) {
-        handleDailyPatientReport(request, response); 
-        return;
-    }
-    if ("queueTimeReport".equals(action)) {
-        handleQueueTimeReport(request, response); 
-        return;
-    }
+        if ("dailyReport".equals(action)) {
+            handleDailyPatientReport(request, response); 
+            return;
+        }
+        if ("queueTimeReport".equals(action)) {
+            handleQueueTimeReport(request, response); 
+            return;
+        }
 
         patientManager.clearPatientsOnly();
         loadPatientData();
@@ -120,7 +126,6 @@ public class MaintainPatientServlet extends HttpServlet {
         request.setAttribute("consultRoom1", getServletContext().getAttribute("consultRoom1"));
         request.setAttribute("consultRoom2", getServletContext().getAttribute("consultRoom2"));
 
-
         request.getRequestDispatcher("admin.jsp").forward(request, response);
     }
 
@@ -128,6 +133,10 @@ public class MaintainPatientServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String action = req.getParameter("action");
         
+        patientManager.clearPatientsOnly();
+        loadPatientData();
+        patientManager.clearQueue();
+        loadQueueData();
 
         try {
             switch (action) {
@@ -176,13 +185,12 @@ public class MaintainPatientServlet extends HttpServlet {
             req.setAttribute("message", "Error: " + e.getMessage());
             req.getRequestDispatcher("admin.jsp").forward(req, res);
         }
-        
     }
     
     private void handleAdd(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String ic = validateRequiredField(req, "ic");
         String name = validateRequiredField(req, "name");
-        String gender = req.getParameter("gender");
+        String gender = validateRequiredField(req, "gender"); 
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
         String address = req.getParameter("address");
@@ -215,7 +223,7 @@ public class MaintainPatientServlet extends HttpServlet {
     private void handlePatientAdd(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String ic = validateRequiredField(req, "ic");
         String name = validateRequiredField(req, "name");
-        String gender = req.getParameter("gender");
+        String gender = validateRequiredField(req, "gender"); 
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
         String address = req.getParameter("address");
@@ -290,7 +298,7 @@ public class MaintainPatientServlet extends HttpServlet {
     private void handleUpdate(HttpServletRequest req, HttpServletResponse res) throws Exception {
         String ic = validateRequiredField(req, "ic");
         String name = validateRequiredField(req, "name");
-        String gender = req.getParameter("gender");
+        String gender = validateRequiredField(req, "gender"); 
         LocalDate dob = parseDate(req.getParameter("dob"));
         String phone = req.getParameter("phone");
         String email = req.getParameter("email");
@@ -339,8 +347,7 @@ public class MaintainPatientServlet extends HttpServlet {
         req.getRequestDispatcher("admin.jsp").forward(req, res);
     }
 
-
-    private void handleServeNext(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+        private void handleServeNext(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         String consultRoom = req.getParameter("consultRoom");
         String indexStr = req.getParameter("queueNumber");
 
@@ -658,12 +665,17 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private void savePatientData() throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(getDataFilePath("patients.txt")))) {
+        String patientFile = getDataFilePath("patients.txt");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(patientFile, false))) { // false = overwrite
             for (Patient p : patientManager.getAllPatientsArray()) {
                 bw.write(String.join(",",
-                    p.getIcNum(), p.getName(), p.getGender(),
+                    p.getIcNum(), 
+                    p.getName(), 
+                    p.getGender(), 
                     p.getDateOfBirth() != null ? p.getDateOfBirth().toString() : "",
-                    p.getPhoneNum(), p.getEmail(), p.getAddress(),
+                    p.getPhoneNum() != null ? p.getPhoneNum() : "",
+                    p.getEmail() != null ? p.getEmail() : "",
+                    p.getAddress() != null ? p.getAddress() : "",
                     p.getDateRegistered() != null ? p.getDateRegistered().toString() : ""
                 ));
                 bw.newLine();
@@ -672,7 +684,8 @@ public class MaintainPatientServlet extends HttpServlet {
     }
     
     private void saveQueueData() throws IOException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(getDataFilePath("queue.txt")))) {
+        String queueFile = getDataFilePath("queue.txt");
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(queueFile, false))) { // false = overwrite
             Patient[] queue = patientManager.getQueueAsArray();
             for (int i = 0; i < queue.length; i++) {
                 Patient p = queue[i];
