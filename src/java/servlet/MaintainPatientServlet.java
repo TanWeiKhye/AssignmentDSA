@@ -46,6 +46,13 @@ public class MaintainPatientServlet extends HttpServlet {
         patientManager.clearPatientsOnly(); 
 
         String patientFile = getDataFilePath("patients.txt");
+        File file = new File(patientFile);
+        
+        if (!file.exists()) {
+            LOGGER.info("No patient file found. It will be created.");
+            return;
+        }
+
         try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -61,8 +68,6 @@ public class MaintainPatientServlet extends HttpServlet {
                     }
                 }
             }
-        } catch (FileNotFoundException e) {
-            LOGGER.info("No patient file found. It will be created.");
         }
     }
     
@@ -91,8 +96,8 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private String getDataFilePath(String filename) {
-        String basePath = "C:/Users/hongj/OneDrive/Documents/NetBeansProjects/AssignmentDSA/web/data/";
-        return basePath + filename;
+        String webRootPath = getServletContext().getRealPath("/");
+        return new File(webRootPath + "../../web/data/" + filename).getAbsolutePath();
     }
 
     @Override
