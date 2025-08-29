@@ -30,12 +30,9 @@ public class MaintainPatientServlet extends HttpServlet {
         super.init();
         patientManager = new MaintainPatient();
 
-        String dataPath = getServletContext().getRealPath("/") + DATA_DIR;
-        new File(dataPath).mkdirs();
-
         try {
-            loadPatientData();
-            loadQueueData();  
+            loadPatientData();  
+            loadQueueData();     
         } catch (IOException e) {
             throw new ServletException("Failed to load patient data", e);
         }
@@ -43,6 +40,7 @@ public class MaintainPatientServlet extends HttpServlet {
         getServletContext().setAttribute("patientManager", patientManager);
         getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray());
     }
+
 
     private void loadPatientData() throws IOException {
         patientManager.clearPatientsOnly(); 
@@ -93,7 +91,8 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private String getDataFilePath(String filename) {
-        return getServletContext().getRealPath("/") + DATA_DIR + File.separator + filename;
+        String basePath = "C:/Users/hongj/OneDrive/Documents/NetBeansProjects/AssignmentDSA/web/data/";
+        return basePath + filename;
     }
 
     @Override
