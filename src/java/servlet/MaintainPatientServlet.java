@@ -30,12 +30,9 @@ public class MaintainPatientServlet extends HttpServlet {
         super.init();
         patientManager = new MaintainPatient();
 
-        String dataPath = getServletContext().getRealPath("/") + DATA_DIR;
-        new File(dataPath).mkdirs();
-
         try {
-            loadPatientData();
-            loadQueueData();  
+            loadPatientData();  
+            loadQueueData();     
         } catch (IOException e) {
             throw new ServletException("Failed to load patient data", e);
         }
@@ -44,10 +41,18 @@ public class MaintainPatientServlet extends HttpServlet {
         getServletContext().setAttribute("walkInQueue", patientManager.getQueueAsArray());
     }
 
+
     private void loadPatientData() throws IOException {
         patientManager.clearPatientsOnly(); 
 
         String patientFile = getDataFilePath("patients.txt");
+        File file = new File(patientFile);
+        
+        if (!file.exists()) {
+            LOGGER.info("No patient file found. It will be created.");
+            return;
+        }
+
         try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -63,8 +68,6 @@ public class MaintainPatientServlet extends HttpServlet {
                     }
                 }
             }
-        } catch (FileNotFoundException e) {
-            LOGGER.info("No patient file found. It will be created.");
         }
     }
     
@@ -93,7 +96,8 @@ public class MaintainPatientServlet extends HttpServlet {
     }
 
     private String getDataFilePath(String filename) {
-        return getServletContext().getRealPath("/") + DATA_DIR + File.separator + filename;
+        String webRootPath = getServletContext().getRealPath("/");
+        return new File(webRootPath + "../../web/data/" + filename).getAbsolutePath();
     }
 
     @Override
