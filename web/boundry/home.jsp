@@ -52,7 +52,7 @@
                     <a href="DoctorManagement?ic=<%= lastIc %>" class="link_item">
                         Doctor Management Module
                     </a>
-                    <a href="ConsultationManagement" class="link_item">
+                    <a href="/AssignmentDSA/consultationManagement.jsp" class="link_item">
                         Consultation Management Module
                     </a>
                     <a href="MedicalTreatmentManagement" class="link_item">
