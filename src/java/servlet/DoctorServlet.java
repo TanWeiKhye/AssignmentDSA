@@ -64,9 +64,12 @@ public class DoctorServlet extends HttpServlet {
 
 					// Read education data
 					while ((line = reader.readLine()) != null && !line.equals("---")) {
+						if (line.trim().isEmpty()) {
+							continue;
+						}
 						String[] eduData = line.split("\\|");
 						for (String eduItem : eduData) {
-							edu.add(eduItem);
+							edu.add(eduItem.trim());
 						}
 					}
 
@@ -96,7 +99,7 @@ public class DoctorServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		request.setAttribute("doctors", doctors);
-		
+
 		RequestDispatcher rd = request.getRequestDispatcher("boundry/doctor.jsp");
 		rd.forward(request, response);
 	}
