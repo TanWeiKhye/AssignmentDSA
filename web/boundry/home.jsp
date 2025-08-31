@@ -55,7 +55,7 @@
                     <a href="ConsultationManagement" class="link_item">
                         Consultation Management Module
                     </a>
-                    <a href="MedicalTreatmentManagement" class="link_item">
+                    <a href="/AssignmentDSA/medicalRecordAdmin.jsp" class="link_item">
                         Medical Treatment Management Module
                     </a>
                     <a href="PharmacyManagement" class="link_item">
