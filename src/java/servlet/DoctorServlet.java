@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 public class DoctorServlet extends HttpServlet {
 
     private static AVLTree<Doctor> doctors = new AVLTree<>();
-    private static final String ABSOLUTE_FILE_PATH = "C:\\Users\\hongj\\OneDrive\\Documents\\NetBeansProjects\\AssignmentDSA\\web\\data\\doctors.txt";
-    private static final String FILE_PATH = "C:\\Users\\hongj\\OneDrive\\Documents\\NetBeansProjects\\AssignmentDSA\\web\\data\\schedule.txt";
+   private static final String DOCTOR_FILE = "data/doctors.txt";
+    private static final String SCHEDULE_FILE = "data/schedule.txt";
 
     @Override
     public void init() throws ServletException {
@@ -44,7 +44,7 @@ public class DoctorServlet extends HttpServlet {
     }
 
     private void loadDoctorData() throws IOException, ParseException {
-        String filePath = ABSOLUTE_FILE_PATH;
+         String filePath = getServletContext().getRealPath("/" + DOCTOR_FILE);
         doctors = new AVLTree<>(); // reinitialize the list
 
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
@@ -103,7 +103,7 @@ public class DoctorServlet extends HttpServlet {
     }
 
     private void saveDoctorData() {
-        String filePath = ABSOLUTE_FILE_PATH;
+        String filePath = getServletContext().getRealPath("/" + DOCTOR_FILE);
         File file = new File(filePath);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -158,7 +158,7 @@ public class DoctorServlet extends HttpServlet {
     }
     
     private void saveAllSchedulesToFile() {
-        String scheduleFilePath = FILE_PATH;
+        String scheduleFilePath = getServletContext().getRealPath("/" + SCHEDULE_FILE);
         File file = new File(scheduleFilePath);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
@@ -302,6 +302,7 @@ public class DoctorServlet extends HttpServlet {
                 }
 
                 request.setAttribute("message", "Doctor added successfully!");
+                response.sendRedirect("DoctorManagement");
             } catch (ParseException e) {
                 request.setAttribute("error", "Invalid date format.");
             }
@@ -337,6 +338,7 @@ public class DoctorServlet extends HttpServlet {
                     saveDoctorData();
 
                     request.setAttribute("message", "Doctor updated successfully!");
+                    response.sendRedirect("DoctorManagement?ic=" + originalIc);
                 } catch (ParseException e) {
                     request.setAttribute("error", "Invalid date format.");
                 }
@@ -385,7 +387,26 @@ public class DoctorServlet extends HttpServlet {
             }
 
             response.sendRedirect("DoctorManagement?ic=" + ic);
+        }else if ("delete".equals(action)) {
+    String ic = request.getParameter("ic");
+
+    if (ic != null && !ic.isEmpty()) {
+        Doctor doctorToDelete = doctors.search(new Doctor(ic));
+
+        if (doctorToDelete != null) {
+            doctors.delete(doctorToDelete);  // Remove from AVLTree
+            saveDoctorData();                // Persist changes
+            request.setAttribute("message", "Doctor deleted successfully!");
+        } else {
+            request.setAttribute("error", "Doctor not found.");
         }
+    } else {
+        request.setAttribute("error", "Invalid IC provided.");
+    }
+
+    // Redirect back to the doctor management page
+    response.sendRedirect("DoctorManagement");
+}
     }
     
     private void generateNext7DaysScheduleForAllDoctors() {
