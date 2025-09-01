@@ -4,9 +4,41 @@
         <servlet-name>MaintainPatientServlet</servlet-name>
         <servlet-class>servlet.MaintainPatientServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>MaintainTreatmentServlet</servlet-name>
+        <servlet-class>servlet.MaintainTreatmentServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MaintainDiagnosisServlet</servlet-name>
+        <servlet-class>servlet.MaintainDiagnosisServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>DataInit</servlet-name>
+        <servlet-class>servlet.DataInit</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MedicalModuleReportServlet</servlet-name>
+        <servlet-class>servlet.MedicalModuleReportServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>MaintainPatientServlet</servlet-name>
         <url-pattern>/MaintainPatientServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MaintainTreatmentServlet</servlet-name>
+        <url-pattern>/MaintainTreatmentServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MaintainDiagnosisServlet</servlet-name>
+        <url-pattern>/MaintainDiagnosisServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>DataInit</servlet-name>
+        <url-pattern>/DataInit</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MedicalModuleReportServlet</servlet-name>
+        <url-pattern>/MedicalModuleReportServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
