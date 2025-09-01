@@ -121,11 +121,6 @@ public class LinkedMap<K, V> implements MapInterface<K, V> {
         size = 0;
     }
     
-    @Override
-    public V getOrDefault(K key, V defaultValue) {
-        V value = get(key);
-        return value != null ? value : defaultValue;
-    }
     
     @Override
     public ArrayList<K> keySet() {
