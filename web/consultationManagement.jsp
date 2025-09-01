@@ -1,5 +1,8 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ page import="entity.Consultation" %>
+                <%
+    java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -79,10 +82,16 @@
     %>
 </div>
 
-    <% String message = (String) request.getAttribute("message"); %>
-    <% if (message != null) { %>
-        <div class="message"><%= message %></div>
-    <% } %>
+    <%
+    String message = (String) session.getAttribute("message");
+    if (message != null) {
+%>
+    <div class="message"><%= message %></div>
+<%
+        session.removeAttribute("message"); // clear after showing
+    }
+%>
+
 
     <!-- Action buttons -->
     <div style="text-align:center; margin-bottom:20px;">
@@ -109,7 +118,7 @@
                 <td><%= con.getConsultationId() %></td>
                 <td><%= con.getPatient() != null ? con.getPatient().getName() : "N/A" %></td>
                 <td><%= con.getDoctor() != null ? con.getDoctor().getName() : "N/A" %></td>
-                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().toString() : "N/A" %></td>
+                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().format(dtf) : "N/A" %></td>
                 <td class="status-scheduled"><%= con.getStatus() != null ? con.getStatus() : "N/A" %></td>
             </tr>
             <% } %>
@@ -135,7 +144,7 @@
                 <td><%= con.getConsultationId() %></td>
                 <td><%= con.getPatient() != null ? con.getPatient().getName() : "N/A" %></td>
                 <td><%= con.getDoctor() != null ? con.getDoctor().getName() : "N/A" %></td>
-                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().toString() : "N/A" %></td>
+                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().format(dtf) : "N/A" %></td>
                 <td class="status-inprogress"><%= con.getStatus() != null ? con.getStatus() : "N/A" %></td>
             </tr>
             <% } %>
@@ -161,8 +170,8 @@
                 <td><%= con.getConsultationId() %></td>
                 <td><%= con.getPatient() != null ? con.getPatient().getName() : "N/A" %></td>
                 <td><%= con.getDoctor() != null ? con.getDoctor().getName() : "N/A" %></td>
-                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().toString() : "N/A" %></td>
-                <td><%= con.getNextAppointment() != null ? con.getNextAppointment().toString() : "N/A" %></td>
+                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().format(dtf) : "N/A" %></td>
+                <td><%= con.getNextAppointment() != null ? con.getNextAppointment().format(dtf) : "N/A" %></td>
                 <td class="status-completed"><%= con.getStatus() != null ? con.getStatus() : "N/A" %></td>
             </tr>
             <% } %>
@@ -194,7 +203,7 @@
                 <td><%= con.getConsultationId() %></td>
                 <td><%= con.getPatient() != null ? con.getPatient().getName() : "N/A" %></td>
                 <td><%= con.getDoctor() != null ? con.getDoctor().getName() : "N/A" %></td>
-                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().toString() : "N/A" %></td>
+                <td><%= con.getConsultationDateTime() != null ? con.getConsultationDateTime().format(dtf) : "N/A" %></td>
                 <td class="<%= statusClass %>"><%= con.getStatus() != null ? con.getStatus() : "N/A" %></td>
             </tr>
             <% } %>
@@ -328,6 +337,9 @@
     
     <button type="button" class="close-btn" onclick="closeForm()" style="margin-top: 15px;">Cancel</button>
 </div>
+<p>Total scheduled: <%= scheduledConsultations != null ? scheduledConsultations.length : 0 %></p>
+<p>Total in progress: <%= inProgressConsultations != null ? inProgressConsultations.length : 0 %></p>
+<p>Total completed: <%= completedConsultations != null ? completedConsultations.length : 0 %></p>
 
 <script>
 function openForm(id) {
