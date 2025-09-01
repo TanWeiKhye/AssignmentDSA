@@ -58,7 +58,7 @@
                     <a href="MedicalTreatmentManagement" class="link_item">
                         Medical Treatment Management Module
                     </a>
-                    <a href="PharmacyManagement" class="link_item">
+                    <a href="/AssignmentDSA/pharmacy.jsp" class="link_item">
                         Pharmacy Management Module
                     </a>
                 </div>
