@@ -69,30 +69,17 @@
 <button class="back-btn" onclick="window.location.href='home.jsp'">← Back to Home</button>
 <div class="container">
     <h1>Clinic — Consultation Management</h1>
-    <%-- Add this debug section at the top of your JSP --%>
-<div style="background: #f5f5f5; padding: 10px; margin: 10px 0; border: 1px solid #ddd;">
-    <strong>Debug Information:</strong><br>
-    <%
-    java.util.Enumeration<String> params = request.getParameterNames();
-    while (params.hasMoreElements()) {
-        String paramName = params.nextElement();
-        String paramValue = request.getParameter(paramName);
-        out.println(paramName + " = " + paramValue + "<br>");
-    }
-    %>
-</div>
-
     <%
     String message = (String) session.getAttribute("message");
     if (message != null) {
 %>
+
+
     <div class="message"><%= message %></div>
 <%
         session.removeAttribute("message"); // clear after showing
     }
 %>
-
-
     <!-- Action buttons -->
     <div style="text-align:center; margin-bottom:20px;">
         <button onclick="openForm('addForm')">Schedule Consultation</button>
