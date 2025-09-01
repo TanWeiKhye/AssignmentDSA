@@ -26,6 +26,8 @@ public interface TreeInterface<T> {
 	int size();
 	
 	Iterator<T> iterator();
+        
+        Iterator<T> reverseOrderIterator();
 
 	Iterator<T> preOrderIterator();
 
