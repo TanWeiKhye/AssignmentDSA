@@ -52,26 +52,31 @@
 
     <!-- Main Content -->
     <div class="main-content">
+        
         <div class="button-container">
             <!-- Diagnosis Button -->
+        <form action="MaintainDiagnosisServlet" method="get">
             <a href="#" class="btn btn-large">
                 <i class="fas fa-stethoscope"></i> Diagnosis
+                <input type="submit"/>
             </a>
+        </form>
 
             <!-- Treatment Button -->
+            <form action="MaintainTreatmentServlet" method="get">
             <a href="#" class="btn btn-large">
                 <i class="fas fa-pills"></i> Treatment
+                <input type="submit"/>
             </a>
-
-            <!-- Medication Button -->
-            <a href="#" class="btn btn-large">
-                <i class="fas fa-medkit"></i> Medication
-            </a>
+            </form>
 
             <!-- Reports Button -->
+            <form action="MedicalModuleReportServlet" method="get">
             <a href="#" class="btn btn-large">
                 <i class="fas fa-file-alt"></i> Reports
+                <input type="submit"/>
             </a>
+            </form>
         </div>
     </div>
 
