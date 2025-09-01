@@ -13,10 +13,6 @@
         <servlet-class>servlet.MaintainDiagnosisServlet</servlet-class>
     </servlet>
     <servlet>
-        <servlet-name>DataInit</servlet-name>
-        <servlet-class>servlet.DataInit</servlet-class>
-    </servlet>
-    <servlet>
         <servlet-name>MedicalModuleReportServlet</servlet-name>
         <servlet-class>servlet.MedicalModuleReportServlet</servlet-class>
     </servlet>
@@ -31,10 +27,6 @@
     <servlet-mapping>
         <servlet-name>MaintainDiagnosisServlet</servlet-name>
         <url-pattern>/MaintainDiagnosisServlet</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>DataInit</servlet-name>
-        <url-pattern>/DataInit</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MedicalModuleReportServlet</servlet-name>
