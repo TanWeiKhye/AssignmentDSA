@@ -1,7 +1,13 @@
-<%@page import="adt.TreeInterface, entity.Doctor, adt.AVLTree"%>
+<%@page import="adt.TreeInterface, entity.Doctor, adt.AVLTree, entity.Schedule, java.util.Date, java.util.Calendar, java.text.SimpleDateFormat"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
         AVLTree<Doctor> doctors = (AVLTree<Doctor>) request.getAttribute("doctors");
+        String currentDoctorIc = request.getParameter("ic");
+        Doctor currentDoctor = doctors.search(new Doctor(currentDoctorIc));
+        
+        Date dateOfBirth = currentDoctor.getDateOB();
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String formattedDateOB = outputFormat.format(dateOfBirth);
 %>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,9 +34,9 @@
                     <div class="doctor_list">
                         <%
                                                         for (Doctor doctor : doctors) {
-                                                                String lastNum = doctor.lastNumOfIc(doctor.getIc());
+                                                                String doctorIc = doctor.getIc();
                         %>
-                        <a href="DoctorManagement?ic=<%= lastNum%>" class="doctor_spec <%= (request.getParameter("ic") != null && request.getParameter("ic").equals(lastNum)) ? "active" : ""%>"><%= doctor.getName()%></a>
+                        <a href="DoctorManagement?ic=<%= doctorIc %>" class="doctor_spec <%= (doctorIc.equals(currentDoctorIc)) ? "active" : ""%>"><%= doctor.getName()%></a>
                         <%
                                                         }
                         %>
@@ -42,9 +48,9 @@
                     <div class="doctor_card">
                         <div class="profile_header">
                             <div class="profile_header_info">
-                                <h3>Doctor Wee</h3>
+                                <h3><%= currentDoctor.getName() %></h3>
                                 <h4>Cardiologist</h4>
-                                <p>dinjun@gmail.com</p>
+                                <p><%= currentDoctor.getEmail()%></p>
                             </div>
                             <div class="profile_header_action">
                                 <button class="btn">Edit Profile</button>
@@ -60,15 +66,14 @@
                                         type="text"
                                         name="dob"
                                         id="dob"
-                                        value="2005-08-02"
+                                        value="<%= formattedDateOB %>"
                                         disabled
                                         />
                                 </div>
                                 <div class="profile_detail_info_item">
                                     <label for="gender">Gender: </label>
                                     <select name="gender" id="gender" disabled>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
+                                        <option><%= currentDoctor.getGender()%></option>
                                     </select>
                                 </div>
                                 <div class="profile_detail_info_item">
@@ -77,7 +82,7 @@
                                         type="tel"
                                         name="phone"
                                         id="phone"
-                                        value="+60124867986"
+                                        value="+6<%= currentDoctor.getPhoneNumber()%>"
                                         disabled
                                         />
                                 </div>
@@ -85,9 +90,14 @@
 
                             <h2>Education & Qualifications</h2>
                             <div class="profile_detail_edu">
-                                <div class="profile_detail_edu_item">
-                                    TAR UMT Bachelor of Medicine
-                                </div>
+                                <%
+                                for (int i = 0; i < currentDoctor.getEdu().size(); i++) {
+                                
+                                %>
+                                <div class="profile_detail_edu_item"><%= currentDoctor.getEdu().get(i) %></div>
+                                <%
+                                    }
+                                %>
                             </div>
                         </div>
                     </div>
@@ -102,27 +112,37 @@
                                         <thead>
                                             <tr>
                                                 <th>Date</th>
-                                                <th>Day</th>
+                                                <th>Day</th>    
                                                 <th>Shift</th>
                                                 <th>Location</th>
                                                 <th>Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            <%
+                                                Calendar calander = Calendar.getInstance();
+                                            for (int i = 0; i < 7; i++) {
+                                            String statusClass = "";
+                                            if (currentDoctor.getSchedules().get(0).getStatus().equals("Available")) {
+                                                statusClass = "status-available";
+                                                } else if (currentDoctor.getSchedules().get(0).getStatus().equals("Booked")) {
+                                                statusClass = "status-unavailable";
+                                                }
+                                                
+                                                Date currentDate = calander.getTime();
+                                            
+                                            %>
                                             <tr>
-                                                <td>2025-08-01</td>
-                                                <td>Friday</td>
-                                                <td>09:00 AM - 05:00 PM</td>
-                                                <td>Main Clinic</td>
-                                                <td class="status-available">Scheduled</td>
+                                                <td><%= outputFormat.format(currentDate) %></td>
+                                                <td><%= new SimpleDateFormat("EEEE").format(currentDate) %></td>
+                                                <td></td>
+                                                <td><%= currentDoctor.getSchedules().get(0).getLocation() %></td>
+                                                <td class="<%= statusClass%>"><%= currentDoctor.getSchedules().get(0).getStatus() %></td>
                                             </tr>
-                                            <tr>
-                                                <td>2025-08-01</td>
-                                                <td>Friday</td>
-                                                <td>09:00 AM - 05:00 PM</td>
-                                                <td>Main Clinic</td>
-                                                <td class="status-unavailable">Off</td>
-                                            </tr>
+                                            <%
+                                                calander.add(Calendar.DAY_OF_YEAR, 1);
+                                                }
+                                            %>
                                         </tbody>
                                     </table>
                                 </div>
