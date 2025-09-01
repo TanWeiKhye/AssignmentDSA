@@ -9,31 +9,27 @@ import java.time.LocalDateTime;
  *
  * @author TanWeiKhye
  */
-public class Consultation {
+public class Consultation implements Comparable<Consultation>{
 	private String consultationId;
         private Patient patient;
         private Doctor doctor;
         private LocalDateTime consultationDateTime;
-        private String diagnosis;
-        private String notes;
-        private double fee;
+        private LocalDateTime nextAppointment;
+        private String status; //Status: Scheduled, InProgress, Complete
+
         
         //Default constructor
-        public Consultation(){
-            this.consultationDateTime = LocalDateTime.now();
-        }
+        public Consultation(){}
         
         // Parameterized constructor
         public Consultation(String consultationId, Patient patient, Doctor doctor,
-                        LocalDateTime consultationDateTime, String diagnosis,
-                        String notes, double fee, LocalDateTime nextAppointment) {
+                        LocalDateTime consultationDateTime, LocalDateTime nextAppointment) {
             this.consultationId = consultationId;
             this.patient = patient;
             this.doctor = doctor;
             this.consultationDateTime = consultationDateTime != null ? consultationDateTime : LocalDateTime.now();
-            this.diagnosis = diagnosis;
-            this.notes = notes;
-            this.fee = fee;
+            this.nextAppointment = nextAppointment;
+            this.status = "Scheduled";
         }
         
         // Getters and Setters
@@ -51,14 +47,16 @@ public class Consultation {
             this.consultationDateTime = consultationDateTime; 
         }
 
-        public String getDiagnosis() { return diagnosis; }
-        public void setDiagnosis(String diagnosis) { this.diagnosis = diagnosis; }
+        public LocalDateTime getNextAppointment() { return nextAppointment; }
+        public void setNextAppointment(LocalDateTime nextAppointment) { this.nextAppointment = nextAppointment; }
 
-        public String getNotes() { return notes; }
-        public void setNotes(String notes) { this.notes = notes; }
-
-        public double getFee() { return fee; }
-        public void setFee(double fee) { this.fee = fee; }
+        public String getStatus() { return status; }
+        public void setStatus(String status) { this.status = status; }
+        
+        @Override
+        public int compareTo(Consultation other){
+            return this.consultationId.compareTo(other.consultationId);
+        }
         
         @Override
         public String toString() {
@@ -67,9 +65,28 @@ public class Consultation {
                     ", Patient=" + (patient != null ? patient.getName() : "N/A") +
                     ", Doctor=" + (doctor != null ? doctor.getName() : "N/A") +
                     ", DateTime=" + consultationDateTime +
-                    ", Diagnosis='" + diagnosis + '\'' +
-                    ", Notes='" + notes + '\'' +
-                    ", Fee=" + fee +
+                    ", nextAppointment=" + nextAppointment +
+                    ", status='" + status + '\'' +
                     '}';
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            Consultation other = (Consultation) obj;
+            return consultationId.equals(other.consultationId);
+        }
+
+        @Override
+        public int hashCode() {
+            return consultationId.hashCode();
+        }
+
+        // Helper method for searching by consultation ID
+        public static Consultation createSearchKey(String consultationId) {
+            Consultation searchKey = new Consultation();
+            searchKey.setConsultationId(consultationId);
+            return searchKey;
         }
 }

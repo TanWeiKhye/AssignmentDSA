@@ -13,4 +13,14 @@
             30
         </session-timeout>
     </session-config>
+    <servlet>
+        <servlet-name>MaintainConsultationServlet</servlet-name>
+        <servlet-class>servlet.MaintainConsultationServlet</servlet-class>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>MaintainConsultationServlet</servlet-name>
+        <url-pattern>/MaintainConsultationServlet</url-pattern>
+    </servlet-mapping>
 </web-app>

@@ -14,6 +14,13 @@ public class Doctor extends Person implements Comparable<Doctor> {
 		edu = new ArrayList<>();
 		schedules = new ArrayList<>();
 	}
+        
+        public Doctor() {
+            super("", "", null, "", "", ""); // call superclass constructor with defaults
+            this.edu = new ArrayList<>();
+            this.schedules = new ArrayList<>();
+        }
+
 
 	public void addEdu(String edu) {
 		this.edu.add(edu);
