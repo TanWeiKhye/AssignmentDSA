@@ -69,7 +69,7 @@ public interface MapInterface<K, V> {
      * @param defaultValue the default mapping of the key
      * @return the value to which the specified key is mapped, or defaultValue if no mapping exists
      */
-    V getOrDefault(K key, V defaultValue);
+
     
     /**
      * Returns an ArrayList containing all of the keys in this map.
