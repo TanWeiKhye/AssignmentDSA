@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
  */
 public class Consultation implements Comparable<Consultation>{
 	private String consultationId;
-        private Patient patient;
-        private Doctor doctor;
+        private Patient patientIc;
+        private Doctor doctorIc;
         private LocalDateTime consultationDateTime;
         private LocalDateTime nextAppointment;
         private String status; //Status: Scheduled, InProgress, Complete
@@ -22,11 +22,11 @@ public class Consultation implements Comparable<Consultation>{
         public Consultation(){}
         
         // Parameterized constructor
-        public Consultation(String consultationId, Patient patient, Doctor doctor,
+        public Consultation(String consultationId, Patient patientIc, Doctor doctorIc,
                         LocalDateTime consultationDateTime, LocalDateTime nextAppointment) {
             this.consultationId = consultationId;
-            this.patient = patient;
-            this.doctor = doctor;
+            this.patientIc = patientIc;
+            this.doctorIc = doctorIc;
             this.consultationDateTime = consultationDateTime != null ? consultationDateTime : LocalDateTime.now();
             this.nextAppointment = nextAppointment;
             this.status = "Scheduled";
@@ -36,11 +36,11 @@ public class Consultation implements Comparable<Consultation>{
         public String getConsultationId() { return consultationId; }
         public void setConsultationId(String consultationId) { this.consultationId = consultationId; }
 
-        public Patient getPatient() { return patient; }
-        public void setPatient(Patient patient) { this.patient = patient; }
+        public Patient getPatient() { return patientIc; }
+        public void setPatient(Patient patient) { this.patientIc = patient; }
 
-        public Doctor getDoctor() { return doctor; }
-        public void setDoctor(Doctor doctor) { this.doctor = doctor; }
+        public Doctor getDoctor() { return doctorIc; }
+        public void setDoctor(Doctor doctor) { this.doctorIc = doctor; }
 
         public LocalDateTime getConsultationDateTime() { return consultationDateTime; }
         public void setConsultationDateTime(LocalDateTime consultationDateTime) { 
@@ -62,8 +62,8 @@ public class Consultation implements Comparable<Consultation>{
         public String toString() {
             return "Consultation{" +
                     "ID='" + consultationId + '\'' +
-                    ", Patient=" + (patient != null ? patient.getName() : "N/A") +
-                    ", Doctor=" + (doctor != null ? doctor.getName() : "N/A") +
+                    ", Patient=" + (patientIc != null ? patientIc.getName() : "N/A") +
+                    ", Doctor=" + (doctorIc != null ? doctorIc.getName() : "N/A") +
                     ", DateTime=" + consultationDateTime +
                     ", nextAppointment=" + nextAppointment +
                     ", status='" + status + '\'' +

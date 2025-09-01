@@ -41,35 +41,37 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Itera
 		root = delete(data, root);
 	}
 
-	private Node delete(T data, Node node) {
-		if (node == null) {
-			return null;
-		}
+        private Node delete(T data, Node node) {
+            if (node == null) {
+                return null;
+            }
 
-		if (data.compareTo(node.data) < 0) {
-			node.left = delete(data, node.left);
-		} else if (data.compareTo(node.data) > 0) {
-			node.right = delete(data, node.right);
-		} else {
-			if (node.left == null) {
-				return node.right;
-			} else if (node.right == null) {
-				return node.left;
-			}
+            if (data.compareTo(node.data) < 0) {
+                node.left = delete(data, node.left);
+            } else if (data.compareTo(node.data) > 0) {
+                node.right = delete(data, node.right);
+            } else {
+                // --- THIS IS THE START OF THE FIX ---
+                this.size--; // Decrement size when the node is found
 
-			node.data = getMax(node.left);
-			node.left = delete(getMax(node.left), node.left);
-		}
+                if (node.left == null) {
+                    return node.right;
+                } else if (node.right == null) {
+                    return node.left;
+                }
 
-		// A null node after deletion does not need its height updated
-		if (node == null) {
-			this.size--;
-			return node;
-		}
+                node.data = getMax(node.left);
+                node.left = delete(getMax(node.left), node.left);
+                // Because of the recursive call above, we must re-increment the size
+                // to avoid a double count. The recursive call will handle the decrement.
+                this.size++; 
+                // --- THIS IS THE END OF THE FIX ---
+            }
 
-		updateHeight(node);
-		return applyRotation(node);
-	}
+            // The node will not be null here, so no need for a null check before update
+            updateHeight(node);
+            return applyRotation(node);
+        }
 
 	private void updateHeight(Node node) {
 		node.height = 1 + Math.max(height(node.left), height(node.right));
@@ -206,6 +208,11 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Itera
 	public Iterator<T> iterator() {
 		return new InOrderIterator();
 	}
+        
+        @Override
+        public Iterator<T> reverseOrderIterator() {
+            return new ReverseOrderIterator();
+        }
 
 	@Override
 	public Iterator<T> preOrderIterator() {
@@ -249,6 +256,47 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Itera
 			}
 		}
 	}
+        
+        
+        private class ReverseOrderIterator implements Iterator<T> {
+
+            private StackInterface<Node> stack;
+
+            public ReverseOrderIterator() {
+                stack = new LinkedStack<>();
+                // Start by pushing the path to the LARGEST element (all the way right)
+                pushRightNodes(root);
+            }
+
+            @Override
+            public boolean hasNext() {
+                return !stack.isEmpty();
+            }
+
+            @Override
+            public T next() {
+                if (!hasNext()) {
+                    throw new java.util.NoSuchElementException();
+                }
+
+                // The node at the top of the stack is the next largest
+                Node node = stack.pop(); 
+
+                // Before returning, prepare for the next call by pushing the
+                // right-most path of this node's LEFT child.
+                pushRightNodes(node.left); 
+
+                return node.data;
+            }
+
+            // Helper method to push the current node and all its right children
+            private void pushRightNodes(Node node) {
+                while (node != null) {
+                    stack.push(node);
+                    node = node.right; // The key change is here: we go right
+                }
+            }
+        }
 
 	private class PreOrderIterator implements Iterator<T> {
 

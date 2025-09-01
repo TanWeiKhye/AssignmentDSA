@@ -15,17 +15,27 @@ import java.time.LocalDateTime;
 public class MaintainConsultation {
     private TreeInterface<Consultation> consultationTree;
     private ListInterface<Consultation> consultationList;
-    private static int consultationCounter = 1011;
+    private static int defaultCounter = 1000;
     
     public MaintainConsultation() {
         consultationTree = new AVLTree<>();
         consultationList = new ArrayList<>();
     }
-    
+   
     public String generateConsultationId() {
-        consultationCounter++;
-        return String.format("CONST%04d", consultationCounter);
-    }
+    // Use the current consultation list size as the base
+    int nextId = defaultCounter + (consultationList != null ? consultationList.size() : 0) + 1;
+    
+    // Make sure the new ID does not collide with existing IDs
+    String newId;
+    do {
+        newId = String.format("CONST%04d", nextId);
+        nextId++;
+    } while (consultationTree != null && consultationTree.search(Consultation.createSearchKey(newId)) != null);
+    
+    return newId;
+}
+
     
     public void loadConsultationsFromFile(String filePath, MaintainPatient patientManager) throws IOException {  
     clearAllConsultations();
@@ -95,27 +105,26 @@ private Doctor findDoctorByIc(String doctorIc) {
 
 public void saveConsultationsToFile(String filePath) throws IOException {
     try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-        for (int i = 0; i <= consultationList.size(); i++) {
-            Consultation consultation = consultationList.get(i);
-            
-            // Add null checks for patient and doctor
-            String patientIc = (consultation.getPatient() != null) ? consultation.getPatient().getIc() : "UNKNOWN_PATIENT";
-            String doctorIc = (consultation.getDoctor() != null) ? consultation.getDoctor().getIc() : "UNKNOWN_DOCTOR";
-            
+        for (int i = 0; i < consultationList.size(); i++) {
+            Consultation c = consultationList.get(i);
+            String patientIc = (c.getPatient() != null && c.getPatient().getIc() != null)
+                    ? c.getPatient().getIc() : "UNKNOWN_PATIENT";
+            String doctorIc = (c.getDoctor() != null && c.getDoctor().getIc() != null)
+                    ? c.getDoctor().getIc() : "UNKNOWN_DOCTOR";
+
             writer.write(String.join(",",
-                consultation.getConsultationId(),
+                c.getConsultationId(),
                 patientIc,
                 doctorIc,
-                consultation.getConsultationDateTime() != null ? 
-                    consultation.getConsultationDateTime().toString() : "",
-                consultation.getNextAppointment() != null ? 
-                    consultation.getNextAppointment().toString() : "",
-                consultation.getStatus()
+                c.getConsultationDateTime() != null ? c.getConsultationDateTime().toString() : "",
+                c.getNextAppointment() != null ? c.getNextAppointment().toString() : "",
+                c.getStatus() != null ? c.getStatus() : "Scheduled"
             ));
             writer.newLine();
         }
     }
 }
+
 
 
     
@@ -132,71 +141,143 @@ public void saveConsultationsToFile(String filePath) throws IOException {
         return true;
     }
     
-    public boolean startConsultation(String consultationId) {
-        Consultation searchKey = Consultation.createSearchKey(consultationId);
-        Consultation consultation = consultationTree.search(searchKey);
-        
-        if (consultation != null && "Scheduled".equals(consultation.getStatus())) {
-            consultation.setStatus("InProgress");
-            return true;
+    public boolean startConsultation(String consultationId, String filePath) {
+    Consultation searchKey = Consultation.createSearchKey(consultationId);
+    Consultation consultation = consultationTree.search(searchKey);
+
+    if (consultation != null && "Scheduled".equals(consultation.getStatus())) {
+        consultation.setStatus("InProgress");
+        try {
+            saveConsultationsToFile(filePath);
+        } catch (IOException e) {
+            System.err.println("Failed to save after starting consultation: " + e.getMessage());
         }
-        return false;
+        return true;
     }
+    return false;
+}
     
-    public boolean completeConsultation(String consultationId) {
-        Consultation searchKey = Consultation.createSearchKey(consultationId);
-        Consultation consultation = consultationTree.search(searchKey);
-        
-        if (consultation != null && "InProgress".equals(consultation.getStatus())) {
-            consultation.setStatus("Completed");
-            return true;
+    public boolean completeConsultation(String consultationId, String filePath) {
+    Consultation searchKey = Consultation.createSearchKey(consultationId);
+    Consultation consultation = consultationTree.search(searchKey);
+
+    if (consultation != null && "InProgress".equals(consultation.getStatus())) {
+        consultation.setStatus("Completed");
+        try {
+            saveConsultationsToFile(filePath);
+        } catch (IOException e) {
+            System.err.println("Failed to save after completing consultation: " + e.getMessage());
         }
-        return false;
+        return true;
     }
+    return false;
+}
     
-    public boolean cancelConsultation(String consultationId) {
-        Consultation searchKey = Consultation.createSearchKey(consultationId);
-        Consultation consultation = consultationTree.search(searchKey);
-        
-        if (consultation != null && !"Completed".equals(consultation.getStatus())) {
-            consultation.setStatus("Cancelled");
-            return true;
+    public boolean cancelConsultation(String consultationId, String filePath) {
+    Consultation searchKey = Consultation.createSearchKey(consultationId);
+    Consultation consultation = consultationTree.search(searchKey);
+
+    if (consultation != null && !"Completed".equals(consultation.getStatus())) {
+        consultation.setStatus("Cancelled");
+        try {
+            saveConsultationsToFile(filePath);
+        } catch (IOException e) {
+            System.err.println("Failed to save after cancelling consultation: " + e.getMessage());
         }
-        return false;
+        return true;
     }
-    
+    return false;
+}
+   
     public boolean scheduleFollowUp(String consultationId, LocalDateTime nextAppointment) {
-        Consultation searchKey = Consultation.createSearchKey(consultationId);
-        Consultation consultation = consultationTree.search(searchKey);
-        
-        if (consultation != null && "Completed".equals(consultation.getStatus())) {
-            // Create a new consultation for the follow-up
-            Consultation followUp = new Consultation(
-                generateConsultationId(),
-                consultation.getPatient(),
-                consultation.getDoctor(),
-                nextAppointment,
-                null
-            );
-            followUp.setStatus("Scheduled");
-            
-            consultationTree.insert(followUp);
-            consultationList.add(followUp);
+    Consultation searchKey = Consultation.createSearchKey(consultationId);
+    Consultation consultation = consultationTree.search(searchKey);
+    
+    if (consultation != null && "Completed".equals(consultation.getStatus())) {
+        // Update the original consultation with the next appointment
+        consultation.setNextAppointment(nextAppointment);
+
+        // Create a new consultation for the follow-up
+        Consultation followUp = new Consultation(
+            generateConsultationId(),
+            consultation.getPatient(),
+            consultation.getDoctor(),
+            nextAppointment,
+            null
+        );
+        followUp.setStatus("Scheduled");
+
+        consultationTree.insert(followUp);
+        consultationList.add(followUp);
+
+        return true;
+    }
+    return false;
+}
+
+
+
+    
+        // helper to avoid blocking rescheduling of same consultation
+public boolean isDoctorAvailable(Doctor doctor, LocalDateTime dateTime, String skipConsultationId) {
+    for (int i = 0; i < consultationList.size(); i++) {
+        Consultation cons = consultationList.get(i);
+        if (cons == null) continue;
+        if (skipConsultationId != null && skipConsultationId.equals(cons.getConsultationId())) continue;
+
+        if (cons.getDoctor() != null && doctor != null &&
+            cons.getDoctor().getIc() != null && doctor.getIc() != null &&
+            cons.getDoctor().getIc().equals(doctor.getIc()) &&
+            cons.getConsultationDateTime() != null &&
+            cons.getConsultationDateTime().equals(dateTime) &&
+            !"Cancelled".equals(cons.getStatus())) {
+            return false;
+        }
+    }
+    return true;
+}
+
+public boolean rescheduleConsultation(String consultationId, LocalDateTime newDateTime) {
+    Consultation searchKey = Consultation.createSearchKey(consultationId);
+    Consultation c = consultationTree.search(searchKey);
+
+    if (c != null && !"Completed".equals(c.getStatus())) {
+        // Check doctor availability
+        if (isDoctorAvailable(c.getDoctor(), newDateTime, consultationId)) {
+            // Update main consultation date/time
+            c.setConsultationDateTime(newDateTime);
+
+            // If this consultation has a next appointment, update it too
+            if (c.getNextAppointment() != null) {
+                c.setNextAppointment(newDateTime.plusDays(1)); // example logic, or keep original interval
+            }
+
+            // Check if this is a follow-up of another consultation
+            for (int i = 0; i < consultationList.size(); i++) {
+                Consultation parent = consultationList.get(i);
+                if (parent != null && newDateTime.equals(parent.getNextAppointment())) {
+                    // Update parent's nextAppointment to match rescheduled follow-up
+                    parent.setNextAppointment(newDateTime);
+                }
+            }
+
             return true;
         }
-        return false;
     }
-    
+    return false;
+}
+
+ 
     public Consultation findConsultationById(String consultationId) {
         Consultation searchKey = Consultation.createSearchKey(consultationId);
         return consultationTree.search(searchKey);
     }
     
-    public ListInterface<Consultation> getConsultationsByPatient(String patientIc) {
+    public ListInterface<Consultation> getConsultationsByPatientIc(String patientIc) {
         ListInterface<Consultation> patientConsultations = new ArrayList<>();
         
         // Iterate through the list instead of using tree iterator
-        for (int i = 0; i <= consultationList.size(); i++) {
+        for (int i = 0; i < consultationList.size(); i++) {
             Consultation cons = consultationList.get(i);
             if (cons.getPatient() != null && cons.getPatient().getIc().equals(patientIc)) {
                 patientConsultations.add(cons);
@@ -205,11 +286,11 @@ public void saveConsultationsToFile(String filePath) throws IOException {
         return patientConsultations;
     }
     
-    public ListInterface<Consultation> getConsultationsByDoctor(String doctorIc) {
+    public ListInterface<Consultation> getConsultationsByDoctorIc(String doctorIc) {
         ListInterface<Consultation> doctorConsultations = new ArrayList<>();
         
         // Iterate through the list instead of using tree iterator
-        for (int i = 1; i <= consultationList.size(); i++) {
+        for (int i = 0; i < consultationList.size(); i++) {
             Consultation cons = consultationList.get(i);
             if (cons.getDoctor() != null && cons.getDoctor().getIc().equals(doctorIc)) {
                 doctorConsultations.add(cons);
@@ -227,7 +308,7 @@ public void saveConsultationsToFile(String filePath) throws IOException {
     }
         
         // Iterate through the list instead of using tree iterator
-        for (int i = 0; i <= consultationList.size(); i++) {
+        for (int i = 0; i < consultationList.size(); i++) {
             Consultation cons = consultationList.get(i);
             if ("Scheduled".equals(cons.getStatus())) {
                 scheduled.add(cons);
@@ -240,7 +321,7 @@ public void saveConsultationsToFile(String filePath) throws IOException {
         ListInterface<Consultation> inProgress = new ArrayList<>();
         
         // Iterate through the list instead of using tree iterator
-        for (int i = 1; i <= consultationList.size(); i++) {
+        for (int i = 0; i < consultationList.size(); i++) {
             Consultation cons = consultationList.get(i);
             if ("InProgress".equals(cons.getStatus())) {
                 inProgress.add(cons);
@@ -253,7 +334,7 @@ public void saveConsultationsToFile(String filePath) throws IOException {
         ListInterface<Consultation> completed = new ArrayList<>();
         
         // Iterate through the list instead of using tree iterator
-        for (int i = 1; i <= consultationList.size(); i++) {
+        for (int i = 0; i < consultationList.size(); i++) {
             Consultation cons = consultationList.get(i);
             if ("Completed".equals(cons.getStatus())) {
                 completed.add(cons);
@@ -262,41 +343,10 @@ public void saveConsultationsToFile(String filePath) throws IOException {
         return completed;
     }
     
-    public Consultation[] getAllConsultations() {
-        Consultation[] array = new Consultation[consultationList.size()];
-        for (int i = 1; i <= consultationList.size(); i++) {
-            array[i-1] = consultationList.get(i);
-        }
-        return array;
+    public ListInterface<Consultation> getAllConsultations() {
+        return consultationList;
     }
-    
-    public boolean isDoctorAvailable(Doctor doctor, LocalDateTime dateTime) {
-        // Iterate through the list instead of using tree iterator
-        for (int i = 1; i <= consultationList.size(); i++) {
-            Consultation cons = consultationList.get(i);
-            if (cons.getDoctor() != null && 
-                cons.getDoctor().getIc().equals(doctor.getIc()) && 
-                cons.getConsultationDateTime().equals(dateTime) &&
-                !"Cancelled".equals(cons.getStatus())) {
-                return false;
-            }
-        }
-        return true;
-    }
-    
-    public boolean rescheduleConsultation(String consultationId, LocalDateTime newDateTime) {
-        Consultation searchKey = Consultation.createSearchKey(consultationId);
-        Consultation consultation = consultationTree.search(searchKey);
-        
-        if (consultation != null && !"Completed".equals(consultation.getStatus())) {
-            if (isDoctorAvailable(consultation.getDoctor(), newDateTime)) {
-                consultation.setConsultationDateTime(newDateTime);
-                return true;
-            }
-        }
-        return false;
-    }
-    
+            
     public boolean deleteConsultation(String consultationId) {
         Consultation searchKey = Consultation.createSearchKey(consultationId);
         Consultation consultation = consultationTree.search(searchKey);
@@ -306,7 +356,7 @@ public void saveConsultationsToFile(String filePath) throws IOException {
             consultationTree.delete(consultation);
             
             // Remove from list
-            for (int i = 1; i <= consultationList.size(); i++) {
+            for (int i = 0; i < consultationList.size(); i++) {
                 Consultation current = consultationList.get(i);
                 if (current.getConsultationId().equals(consultationId)) {
                     consultationList.remove(i);
@@ -332,7 +382,7 @@ public void saveConsultationsToFile(String filePath) throws IOException {
         ListInterface<Consultation> result = new ArrayList<>();
         
         // Iterate through the list instead of using tree iterator
-        for (int i = 1; i <= consultationList.size(); i++) {
+        for (int i = 0; i < consultationList.size(); i++) {
             Consultation cons = consultationList.get(i);
             if (status.equals(cons.getStatus())) {
                 result.add(cons);

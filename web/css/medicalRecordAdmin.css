@@ -1,0 +1,99 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 31 Aug 2025, 1:30:28 pm
+    Author     : Cham Voon Loong
+*/
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+/* Background image */
+body {
+    background: url('../assets/background.jpg') no-repeat center center fixed; 
+    background-size: cover; /* Ensure the background covers the entire page */
+}
+
+/* Overlay to dim the background */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2); /* Black overlay with 20% opacity */
+    z-index: -1; /* Place it behind the content */
+}
+
+.navbar {
+    display: flex;
+    top: 0;
+    width: 100%;
+    height: 12%;
+    z-index: 10;
+    padding: 20px 0; /* Increase navbar height */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background for navbar */
+}
+
+.navbar-brand {
+    font-size: 2rem; /* Make the navbar text larger */
+    color: white; /* White text color for the brand */
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 88%;
+}
+
+.button-container {
+    display: flex; /* Align buttons horizontally */
+    justify-content: space-between; /* Evenly space out buttons */
+    gap: 20px; /* Space between the buttons */
+    max-width: 900px;
+    width: 100%;
+}
+
+.btn-large {
+    font-size: 1.4rem; /* Slightly larger font size */
+    padding: 25px 30px; /* Adjusted padding to make button shorter horizontally */
+    width: 200px; /* Fixed width for shorter buttons */
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    white-space: normal;
+    word-wrap: break-word;
+    text-align: center;
+    text-decoration: none;
+    border: 3px solid white; /* White border */
+    border-radius: 20px; /* Round the corners */
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    font-weight: bold; /* Bold font */
+    text-transform: uppercase; /* Capitalize text */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add box shadow */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+.btn-large .fas {
+    font-size: 3.5rem; /* Increased icon size */
+    color: black; /* Black icon color */
+    margin-bottom: 15px; /* Space between icon and text */
+}
+
+.btn-large:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+    border-color: #004085; /* Darker border on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+}
+
+body {
+    background-color: #f8f9fa;
+}

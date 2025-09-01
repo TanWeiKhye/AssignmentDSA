@@ -323,4 +323,3 @@ public class MaintainConsultationServlet extends HttpServlet { // CHANGED CLASS 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         return LocalDateTime.parse(dateTimeStr, formatter);
     }
-}
