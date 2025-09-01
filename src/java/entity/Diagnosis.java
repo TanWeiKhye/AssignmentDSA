@@ -11,7 +11,6 @@ package entity;
  */
 
 import java.util.Objects;
-import entity.Medication;
 import entity.Treatment;
 import adt.TreeInterface;
 import adt.AVLTree;
@@ -21,16 +20,21 @@ public class Diagnosis implements Comparable<Diagnosis> {
     //Data Fields
     private String diagnosis;
     private TreeInterface<Treatment> treatment;
-    private TreeInterface<Medication> medication;
+   
     
     //Constructors
     public Diagnosis(){
         treatment  = new AVLTree();
-        medication = new AVLTree();
+       
     }
     
     public Diagnosis(String diagnosis){
         this.diagnosis = diagnosis;
+    }
+    
+    public Diagnosis(String diagnosis, AVLTree<Treatment> treatmeent){
+        this.diagnosis = diagnosis;
+        this.treatment = treatment;
     }
     
     //Getters
@@ -42,9 +46,6 @@ public class Diagnosis implements Comparable<Diagnosis> {
         return (AVLTree)this.treatment;
     }
     
-    public AVLTree<Medication> getMedication(){
-        return (AVLTree)this.medication;
-    }
     
     //Setters
     public void setDiagnosis(String diagnosis){
@@ -53,10 +54,6 @@ public class Diagnosis implements Comparable<Diagnosis> {
     
     public void setTreatment(Treatment treatment){
         this.treatment.insert(treatment);
-    }
-    
-    public void setMedication(Medication medication){
-        this.medication.insert(medication);
     }
     
     //equals
