@@ -16,7 +16,6 @@
     <servlet>
         <servlet-name>MaintainConsultationServlet</servlet-name>
         <servlet-class>servlet.MaintainConsultationServlet</servlet-class>
-        <load-on-startup>2</load-on-startup>
     </servlet>
 
     <servlet-mapping>
