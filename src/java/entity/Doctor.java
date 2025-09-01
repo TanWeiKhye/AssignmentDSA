@@ -8,19 +8,24 @@ public class Doctor extends Person implements Comparable<Doctor> {
 
 	private ListInterface<String> edu;
 	private ListInterface<Schedule> schedules;
-
-	public Doctor(String name, String ic, Date dateOB, String phoneNumber, String email, String gender, ListInterface<String> edu, ListInterface<Schedule> schedules) {
-		super(name, ic, dateOB, phoneNumber, email, gender);
+	
+	public Doctor() {
+		super(null, null, null, null, null, null);
 		edu = new ArrayList<>();
 		schedules = new ArrayList<>();
 	}
-        
-        public Doctor() {
-            super("", "", null, "", "", ""); // call superclass constructor with defaults
-            this.edu = new ArrayList<>();
-            this.schedules = new ArrayList<>();
-        }
+	
+	public Doctor(String ic) {
+		super(null, ic, null, null, null, null);
+		edu = new ArrayList<>();
+		schedules = new ArrayList<>();
+	}
 
+	public Doctor(String name, String ic, Date dateOB, String phoneNumber, String email, String gender, ListInterface<String> edu, ListInterface<Schedule> schedules) {
+		super(name, ic, dateOB, phoneNumber, email, gender);
+		this.edu = edu;
+		this.schedules = schedules;
+	}
 
 	public void addEdu(String edu) {
 		this.edu.add(edu);

@@ -8,6 +8,11 @@ package adt;
 public class LinkedMap<K, V> implements MapInterface<K, V> {
     private Node first; // Reference to the first node in the linked list
     private int size;   // Number of key-value mappings in this map
+
+	@Override
+	public V getOrDefault(K key, V defaultValue) {
+		throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+	}
     
     /**
      * Node class representing a key-value pair in the linked list

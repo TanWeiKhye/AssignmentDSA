@@ -3,7 +3,7 @@ package adt;
 import java.util.Iterator;
 
 public interface TreeInterface<T> {
-	
+
     // Inserts a new element into the tree, maintaining balance.
     void insert(T data);
 
@@ -19,19 +19,24 @@ public interface TreeInterface<T> {
     // Finds and returns the maximum element in the tree.
     T getMax();
 
-	// Checks if the tree is empty.
+    // Checks if the tree is empty.
     boolean isEmpty();
-	
-	// Return the size
-	int size();
-	
-	Iterator<T> iterator();
-        
-        Iterator<T> reverseOrderIterator();
+    
+    // Returns the number of elements in the tree
+    int size();
 
-	Iterator<T> preOrderIterator();
+    // Returns an iterator for in-order traversal
+    Iterator<T> iterator();
 
-	Iterator<T> postOrderIterator();
-        
-        void clear();
+    // Returns an iterator for pre-order traversal
+    Iterator<T> preOrderIterator();
+
+    // Returns an iterator for post-order traversal
+    Iterator<T> postOrderIterator();
+    
+    // Clears the tree
+    void clear();
+    
+    // Returns the element at the specified in-order index
+    T get(int index);
 }

@@ -16,25 +16,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class MaintainConsultationServlet extends HttpServlet { 
+public class MaintainConsultationServlet extends HttpServlet { // CHANGED CLASS NAME
     private MaintainConsultation consultationManager;
-    private String consultationFile;
     
     @Override
     public void init() throws ServletException {
         super.init();
         consultationManager = new MaintainConsultation();
-        consultationFile = getServletContext().getRealPath("/") + "data/consultations.txt";
-        
-        
-        MaintainPatient patientManager = (MaintainPatient) getServletContext().getAttribute("patientManager");
-        if (patientManager != null){
-            try{
-                consultationManager.loadConsultationsFromFile(consultationFile,patientManager);
-            } catch (IOException e){
-                System.err.println("Error loading consultations: " + e.getMessage());
-            }
-        }
         getServletContext().setAttribute("consultationManager", consultationManager);
         System.out.println("MaintainConsultationServlet initialized");
     }
@@ -50,10 +38,9 @@ public class MaintainConsultationServlet extends HttpServlet {
         errorMsg = "Error in " + operation + ". Please check server logs for details.";
     }
     
-    request.getSession().setAttribute("message", errorMsg);
-    response.sendRedirect("MaintainConsultationServlet");
+    request.setAttribute("message", errorMsg);
+    request.getRequestDispatcher("consultationManagement.jsp").forward(request, response);
 }
-    
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -71,6 +58,7 @@ public class MaintainConsultationServlet extends HttpServlet {
         
         // Load consultations from file
         try {
+            String consultationFile = getServletContext().getRealPath("/") + "data/consultations.txt";
             consultationManager.loadConsultationsFromFile(consultationFile, patientManager);
             System.out.println("Loaded " + consultationManager.getConsultationCount() + " consultations");
         } catch (IOException e) {
@@ -81,11 +69,11 @@ public class MaintainConsultationServlet extends HttpServlet {
         if ("viewPatientHistory".equals(action)) {
             String patientIc = request.getParameter("patientIc");
             adt.ListInterface<Consultation> patientConsultations = 
-                consultationManager.getConsultationsByPatientIc(patientIc);
+                consultationManager.getConsultationsByPatient(patientIc);
             
             // Convert to array for JSP
             Consultation[] consultationsArray = new Consultation[patientConsultations.size()];
-            for (int i = 0; i < patientConsultations.size(); i++) {
+            for (int i = 0; i <= patientConsultations.size(); i++) {
                 consultationsArray[i] = patientConsultations.get(i);
             }
             
@@ -95,11 +83,11 @@ public class MaintainConsultationServlet extends HttpServlet {
         } else if ("viewDoctorSchedule".equals(action)) {
             String doctorIc = request.getParameter("doctorIc");
             adt.ListInterface<Consultation> doctorConsultations = 
-                consultationManager.getConsultationsByDoctorIc(doctorIc);
+                consultationManager.getConsultationsByDoctor(doctorIc);
             
             // Convert to array for JSP
             Consultation[] consultationsArray = new Consultation[doctorConsultations.size()];
-            for (int i = 0; i < doctorConsultations.size(); i++) {
+            for (int i = 0; i <= doctorConsultations.size(); i++) {
                 consultationsArray[i] = doctorConsultations.get(i);
             }
             
@@ -107,32 +95,31 @@ public class MaintainConsultationServlet extends HttpServlet {
             request.getRequestDispatcher("doctorSchedule.jsp").forward(request, response);
             
         } else {
-            // Convert all consultations to arrays for JSP
-        adt.ListInterface<Consultation> allConsultationsList = consultationManager.getAllConsultations();
-        Consultation[] allConsultations = new Consultation[allConsultationsList.size()];
-        for (int i = 0; i < allConsultationsList.size(); i++) {
-            allConsultations[i] = allConsultationsList.get(i);
-        }
-
-        adt.ListInterface<Consultation> scheduledList = consultationManager.getScheduledConsultations();
-        Consultation[] scheduledArray = new Consultation[scheduledList.size()];
-        for (int i = 0; i < scheduledList.size(); i++) scheduledArray[i] = scheduledList.get(i);
-
-        adt.ListInterface<Consultation> inProgressList = consultationManager.getInProgressConsultations();
-        Consultation[] inProgressArray = new Consultation[inProgressList.size()];
-        for (int i = 0; i < inProgressList.size(); i++) inProgressArray[i] = inProgressList.get(i);
-
-        adt.ListInterface<Consultation> completedList = consultationManager.getCompletedConsultations();
-        Consultation[] completedArray = new Consultation[completedList.size()];
-        for (int i = 0; i < completedList.size(); i++) completedArray[i] = completedList.get(i);
-
-        // Set attributes
-        request.setAttribute("consultations", allConsultations);
-        request.setAttribute("scheduledConsultations", scheduledArray);
-        request.setAttribute("inProgressConsultations", inProgressArray);
-        request.setAttribute("completedConsultations", completedArray);
-
-        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response);
+            // Get all consultation lists for display
+            request.setAttribute("consultations", consultationManager.getAllConsultations());
+            
+            // Convert ListInterface to arrays for JSP
+            adt.ListInterface<Consultation> scheduled = consultationManager.getScheduledConsultations();
+            adt.ListInterface<Consultation> inProgress = consultationManager.getInProgressConsultations();
+            adt.ListInterface<Consultation> completed = consultationManager.getCompletedConsultations();
+            
+            System.out.println("Scheduled consultations: " + scheduled.size());
+            System.out.println("InProgress consultations: " + inProgress.size());
+            System.out.println("Completed consultations: " + completed.size());
+            
+            Consultation[] scheduledArray = new Consultation[scheduled.size()];
+            Consultation[] inProgressArray = new Consultation[inProgress.size()];
+            Consultation[] completedArray = new Consultation[completed.size()];
+            
+            for (int i = 0; i <= scheduled.size(); i++) scheduledArray[i] = scheduled.get(i);
+            for (int i = 0; i <= inProgress.size(); i++) inProgressArray[i] = inProgress.get(i);
+            for (int i = 0; i <= completed.size(); i++) completedArray[i] = completed.get(i);
+            
+            request.setAttribute("scheduledConsultations", scheduledArray);
+            request.setAttribute("inProgressConsultations", inProgressArray);
+            request.setAttribute("completedConsultations", completedArray);
+            
+            request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED JSP NAME
         }
     }
     
@@ -145,17 +132,18 @@ public class MaintainConsultationServlet extends HttpServlet {
         MaintainPatient patientManager = (MaintainPatient) getServletContext().getAttribute("patientManager");
         
         if (patientManager == null) {
-            request.getSession().setAttribute("message", "Patient system not initialized. Please access patient management first.");
-            response.sendRedirect("MaintainConsultationServlet");
+            request.setAttribute("message", "Patient system not initialized. Please access patient management first.");
+            request.getRequestDispatcher("consultationManagement.jsp").forward(request, response);
             return;
         }
         
         // Load consultations before processing POST actions
         try {
+            String consultationFile = getServletContext().getRealPath("/") + "data/consultations.txt";
             consultationManager.loadConsultationsFromFile(consultationFile, patientManager);
         } catch (IOException e) {
-            request.getSession().setAttribute("message", "Error loading consultation data: " + e.getMessage());
-            response.sendRedirect("MaintainConsultationServlet");
+            System.err.println("Error loading consultation data: " + e.getMessage());
+            request.setAttribute("message", "Error loading consultation data: " + e.getMessage());
         }
         
         try {
@@ -182,8 +170,8 @@ public class MaintainConsultationServlet extends HttpServlet {
                     handleDeleteConsultation(request, response);
                     break;
                 default:
-                    request.getSession().setAttribute("message", "Unknown action: " + action);
-                    response.sendRedirect("MaintainConsultationServlet");
+                    request.setAttribute("message", "Unknown action: " + action);
+                    request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
             }
         } catch (Exception e) {
              handleException(request, response, e, action); 
@@ -205,8 +193,8 @@ public class MaintainConsultationServlet extends HttpServlet {
             for (Patient p : patientManager.getAllPatientsArray()) {
                 errorMsg += p.getIc() + " (" + p.getName() + "), ";
             }
-            request.getSession().setAttribute("message", errorMsg);
-            response.sendRedirect("MaintainConsultationServlet");
+            request.setAttribute("message", errorMsg);
+            request.getRequestDispatcher("consultationManagement.jsp").forward(request, response);
             return;
         }
         
@@ -221,64 +209,64 @@ public class MaintainConsultationServlet extends HttpServlet {
         boolean success = consultationManager.createConsultation(patient, doctor, consultationDateTime, null);
         
         if (success) {
-            // Save to file after creations
+            // Save to file after creation
             try {
+                String consultationFile = getServletContext().getRealPath("/") + "data/consultations.txt";
                 consultationManager.saveConsultationsToFile(consultationFile);
                 request.setAttribute("message", "Consultation scheduled successfully");
             } catch (IOException e) {
                 request.setAttribute("message", "Consultation created but failed to save to file: " + e.getMessage());
-                return;
             }
         } else {
-            request.getSession().setAttribute("message", "Failed to schedule consultation");
+            request.setAttribute("message", "Failed to schedule consultation");
         }
         
-        response.sendRedirect("MaintainConsultationServlet");
+        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
     }
     
     private void handleStartConsultation(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String consultationId = request.getParameter("consultationId");
         
-        boolean success = consultationManager.startConsultation(consultationId,consultationFile);
+        boolean success = consultationManager.startConsultation(consultationId);
         
         if (success) {
-            request.getSession().setAttribute("message", "Consultation started successfully");
+            request.setAttribute("message", "Consultation started successfully");
         } else {
-            request.getSession().setAttribute("message", "Failed to start consultation");
+            request.setAttribute("message", "Failed to start consultation");
         }
         
-        response.sendRedirect("MaintainConsultationServlet");
+        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
     }
     
     private void handleCompleteConsultation(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String consultationId = request.getParameter("consultationId");
         
-        boolean success = consultationManager.completeConsultation(consultationId, consultationFile);
+        boolean success = consultationManager.completeConsultation(consultationId);
         
         if (success) {
-            request.getSession().setAttribute("message", "Consultation completed successfully");
+            request.setAttribute("message", "Consultation completed successfully");
         } else {
-            request.getSession().setAttribute("message", "Failed to complete consultation");
+            request.setAttribute("message", "Failed to complete consultation");
         }
         
-        response.sendRedirect("MaintainConsultationServlet");
+        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
     }
     
     private void handleCancelConsultation(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String consultationId = request.getParameter("consultationId");
         
-        boolean success = consultationManager.cancelConsultation(consultationId, consultationFile);
+        boolean success = consultationManager.cancelConsultation(consultationId);
         
         if (success) {
-            request.getSession().setAttribute("message", "Consultation cancelled successfully");
+            request.setAttribute("message", "Consultation cancelled successfully");
         } else {
-            request.getSession().setAttribute("message", "Failed to cancel consultation");
+            request.setAttribute("message", "Failed to cancel consultation");
         }
         
-        response.sendRedirect("MaintainConsultationServlet");
+        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
     }
     
     private void handleScheduleFollowUp(HttpServletRequest request, HttpServletResponse response)
@@ -289,13 +277,12 @@ public class MaintainConsultationServlet extends HttpServlet {
         boolean success = consultationManager.scheduleFollowUp(consultationId, nextAppointment);
         
         if (success) {
-            consultationManager.saveConsultationsToFile(consultationFile);
-            request.getSession().setAttribute("message", "Follow-up appointment scheduled successfully");
+            request.setAttribute("message", "Follow-up appointment scheduled successfully");
         } else {
-            request.getSession().setAttribute("message", "Failed to schedule follow-up appointment");
+            request.setAttribute("message", "Failed to schedule follow-up appointment");
         }
         
-        response.sendRedirect("MaintainConsultationServlet");
+        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
     }
     
     private void handleRescheduleConsultation(HttpServletRequest request, HttpServletResponse response)
@@ -306,13 +293,12 @@ public class MaintainConsultationServlet extends HttpServlet {
         boolean success = consultationManager.rescheduleConsultation(consultationId, newDateTime);
         
         if (success) {
-            consultationManager.saveConsultationsToFile(consultationFile);
-            request.getSession().setAttribute("message", "Consultation rescheduled successfully");
+            request.setAttribute("message", "Consultation rescheduled successfully");
         } else {
-            request.getSession().setAttribute("message", "Failed to reschedule consultation - doctor may not be available");
+            request.setAttribute("message", "Failed to reschedule consultation - doctor may not be available");
         }
         
-        response.sendRedirect("MaintainConsultationServlet");
+        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
     }
     
     private void handleDeleteConsultation(HttpServletRequest request, HttpServletResponse response)
@@ -322,12 +308,12 @@ public class MaintainConsultationServlet extends HttpServlet {
         boolean success = consultationManager.deleteConsultation(consultationId);
         
         if (success) {
-            request.getSession().setAttribute("message", "Consultation deleted successfully");
+            request.setAttribute("message", "Consultation deleted successfully");
         } else {
-            request.getSession().setAttribute("message", "Failed to delete consultation");
+            request.setAttribute("message", "Failed to delete consultation");
         }
         
-        response.sendRedirect("MaintainConsultationServlet");
+        request.getRequestDispatcher("consultationManagement.jsp").forward(request, response); // FIXED
     }
     
     private LocalDateTime parseDateTime(String dateTimeStr) {
@@ -337,4 +323,3 @@ public class MaintainConsultationServlet extends HttpServlet {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
         return LocalDateTime.parse(dateTimeStr, formatter);
     }
-}

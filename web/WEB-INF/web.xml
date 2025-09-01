@@ -5,6 +5,10 @@
         <servlet-class>servlet.MaintainPatientServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>MaintainConsultationServlet</servlet-name>
+        <servlet-class>servlet.MaintainConsultationServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>MaintainTreatmentServlet</servlet-name>
         <servlet-class>servlet.MaintainTreatmentServlet</servlet-class>
     </servlet>
@@ -19,6 +23,10 @@
     <servlet-mapping>
         <servlet-name>MaintainPatientServlet</servlet-name>
         <url-pattern>/MaintainPatientServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MaintainConsultationServlet</servlet-name>
+        <url-pattern>/MaintainConsultationServlet</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>MaintainTreatmentServlet</servlet-name>
