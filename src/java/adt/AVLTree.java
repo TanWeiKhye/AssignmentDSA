@@ -327,6 +327,37 @@ public class AVLTree<T extends Comparable<T>> implements TreeInterface<T>, Itera
 		}
 	}
         
+        // Add this method in your AVLTree class
+        @Override
+        public T get(int index) {
+            if (index < 0 || index >= size) {
+                throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+            }
+            Counter count = new Counter(); // helper counter
+            return getInOrder(root, index, count);
+        }
+
+        // Helper class to keep track of index during recursion
+        private class Counter {
+            int value = 0;
+        }
+
+        // Recursive in-order traversal to find the index-th node
+        private T getInOrder(Node node, int index, Counter count) {
+            if (node == null) return null;
+
+            // Search left subtree
+            T left = getInOrder(node.left, index, count);
+            if (left != null) return left;
+
+            // Check current node
+            if (count.value == index) return node.data;
+            count.value++;
+
+            // Search right subtree
+            return getInOrder(node.right, index, count);
+        }
+        
         @Override
         public void clear() {
             root = null;

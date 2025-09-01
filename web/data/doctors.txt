@@ -1,0 +1,50 @@
+Alan Grant|900101-07-5050|1990-01-01|0123456788|alan.grant@example.com|Male
+Medical School of Singapore, 2010|Cardiology
+2025-09-01|Available|Main Clinic|900101-07-5050
+2025-09-02|Available|Clinic Room|900101-07-5050
+2025-09-03|Available|Main Clinic|900101-07-5050
+2025-09-04|Available|Main Clinic|900101-07-5050
+2025-09-05|Available|Main Clinic|900101-07-5050
+2025-09-06|Available|Main Clinic|900101-07-5050
+2025-09-07|Available|Main Clinic|900101-07-5050
+---
+Ellie Sattler|920515-08-6060|1992-05-15|0139876543|ellie.sattler@example.com|Female
+University of Malaya, 2012|Pediatrics
+2025-09-01|Available|Main Clinic|920515-08-6060
+2025-09-02|Available|Main Clinic|920515-08-6060
+2025-09-03|Available|Main Clinic|920515-08-6060
+2025-09-04|Available|Main Clinic|920515-08-6060
+2025-09-05|Available|Main Clinic|920515-08-6060
+2025-09-06|Available|Main Clinic|920515-08-6060
+2025-09-07|Available|Main Clinic|920515-08-6060
+---
+Ian Malcolm|881122-10-7070|1988-11-22|0191234567|ian.malcolm@example.com|Male
+National University of Singapore, 2008|Oncology
+2025-09-01|Available|Main Clinic|881122-10-7070
+2025-09-02|Available|Main Clinic|881122-10-7070
+2025-09-03|Available|Main Clinic|881122-10-7070
+2025-09-04|Available|Main Clinic|881122-10-7070
+2025-09-05|Available|Main Clinic|881122-10-7070
+2025-09-06|Available|Main Clinic|881122-10-7070
+2025-09-07|Available|Main Clinic|881122-10-7070
+---
+Lex Murphy|950310-02-8080|1995-03-10|0177654321|lex.murphy@example.com|Female
+Universiti Kebangsaan Malaysia, 2015|Dermatology
+2025-09-01|Available|Main Clinic|950310-02-8080
+2025-09-02|Available|Main Clinic|950310-02-8080
+2025-09-03|Available|Main Clinic|950310-02-8080
+2025-09-04|Available|Main Clinic|950310-02-8080
+2025-09-05|Available|Main Clinic|950310-02-8080
+2025-09-06|Available|Main Clinic|950310-02-8080
+2025-09-07|Available|Main Clinic|950310-02-8080
+---
+Tim Murphy|980720-05-9090|1998-07-20|0118765432|tim.murphy@example.com|Male
+
+2025-09-01|Available|Main Clinic|980720-05-9090
+2025-09-02|Available|Main Clinic|980720-05-9090
+2025-09-03|Available|Main Clinic|980720-05-9090
+2025-09-04|Available|Main Clinic|980720-05-9090
+2025-09-05|Available|Main Clinic|980720-05-9090
+2025-09-06|Available|Main Clinic|980720-05-9090
+2025-09-07|Available|Main Clinic|980720-05-9090
+---
